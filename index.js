@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-const SYSTEM = `You are an insurance expert explaining a policy to a friend who knows nothing about insurance. Be short, direct, and human. No jargon. No long sentences. Get to the point.
+const SYSTEM = `You are an expert insurance analyst helping a policyholder understand their specific policy document. Read every section carefully — the declarations page, definitions, perils, exclusions, and endorsements. Your job is to produce a thorough, specific, plain-English analysis of THIS policy. Every insight must come directly from what you read in the document.
 
 Return ONLY valid JSON — no markdown, no backticks, nothing else.
 
@@ -17,35 +17,66 @@ Return ONLY valid JSON — no markdown, no backticks, nothing else.
   "zipCode": "5-digit zip from the document or null",
   "effectiveDate": "MM/DD/YYYY or Not found",
   "expirationDate": "MM/DD/YYYY or Not found",
-  "premium": "$X,XXX/year or /month",
-  "deductible": "$X,XXX",
+  "premium": "$X,XXX/year or /month — include the period",
+  "deductible": "Primary deductible e.g. $1,000",
   "dwellingCoverage": 400000,
   "finishLevel": "Builder-grade (standard finishes) OR Mid-range (upgraded finishes) OR High-end (custom/luxury finishes) OR Not specified",
-  "coverageSummary": "3-5 sentences. Be specific — use the actual dollar amounts, coverage names, and location from the policy. Write directly to the policyholder using 'you' and 'your'. This should read like a knowledgeable friend summarizing exactly what they have. Include the key coverage limits (dwelling, liability, personal property, loss of use etc). No jargon.",
+  "coverageSummary": "3-5 sentences written directly to the policyholder. Use 'you' and 'your'. Be specific — use the actual dollar amounts, coverage names, location, and policy features you found. This should feel like a knowledgeable friend summarizing exactly what they have. Include key limits: dwelling, liability, personal property, loss of use, medical payments if present.",
+  "declarations": [
+    { "label": "Coverage name", "value": "Dollar amount or description" }
+  ],
+  "valuationMethod": {
+    "type": "RCV OR ACV OR Mixed OR Unknown",
+    "explanation": "Explain specifically how THIS policy handles claims — does it pay replacement cost or actual cash value? Quote or reference the specific language you found. Give a real example: if their roof is 10 years old and gets damaged, what would they actually receive? Be concrete."
+  },
+  "subLimits": [
+    {
+      "item": "What is sub-limited e.g. Jewelry, Electronics, Cash",
+      "limit": "The specific dollar cap",
+      "explanation": "Plain English — if they have $5,000 in jewelry but the sub-limit is $1,500, explain exactly what that means for them in a claim."
+    }
+  ],
+  "andClauses": [
+    {
+      "title": "Short descriptive title of this clause",
+      "explanation": "Explain the specific 'and' or 'but' language you found in this policy and exactly how it could affect a claim. Give a realistic scenario."
+    }
+  ],
+  "endorsements": [
+    {
+      "name": "Endorsement name",
+      "explanation": "Plain English explanation of what this add-on does for the policyholder. Be specific about what it changes or adds."
+    }
+  ],
   "scenarios": [
     {
-      "title": "Short title — 3 words max",
+      "title": "3 words max",
       "covered": true,
-      "description": "1-3 sentences. Start with 'If...'. Say exactly what happens, what the limit is, what they need to know. Nothing extra."
+      "description": "Start with 'If...'. 1-3 sentences. Specific to this policy — use actual limits, actual conditions from the document. No generic language."
     }
   ],
   "keyExclusions": [
     {
       "title": "Short title",
-      "description": "1-2 sentences. What's not covered and why it matters. Be specific."
+      "description": "1-2 sentences. Specific to this policy. What's excluded and why it matters to this particular policyholder."
     }
   ],
-  "actionItems": ["One sentence. One concrete thing they should know or do. No fluff."],
+  "actionItems": ["One concrete, specific thing this policyholder should know or do based on what you read. No generic advice."],
   "overallScore": 78
 }
 
 RULES:
-- scenarios: 6-8 max. Order by most likely to happen first. Think: what does this person actually worry about? For homeowners: fire, theft, water damage, liability, storm, flood, earthquake. Each must start with "If..."
-- keyExclusions: 4-5 max. Only the ones that would genuinely surprise someone.
-- actionItems: 3 max. Only if genuinely useful.
-- overallScore: 0-100. Honest. 80+ = solid, 60-79 = ok, below 60 = gaps.
-- dwellingCoverage: number only, no dollar sign. null if not a homeowners/property policy.
-- Keep everything short. If you can say it in 10 words instead of 20, use 10.`;
+- declarations: list all major coverage limits from the dec page — dwelling, other structures, personal property, loss of use, liability, medical payments, etc. 6-10 items.
+- valuationMethod: this is critical. Read carefully for RCV, ACV, actual cash value, replacement cost, extended replacement cost. Explain the real-world impact with a specific example relevant to their policy.
+- subLimits: read the personal property section carefully for per-item or per-category caps. These are often buried. Include only what you actually find.
+- andClauses: look for exclusion language with 'and' or 'but' that narrows or voids coverage. Explain the real consequence.
+- endorsements: check the back of the policy for riders, add-ons, or endorsement pages. List what you find.
+- scenarios: 6-8. Order most likely first. Each must reference actual policy limits or conditions.
+- keyExclusions: 4-5. Only the most important ones that would surprise the policyholder.
+- actionItems: 3 max. Genuinely useful and specific to this policy.
+- overallScore: honest 0-100. 80+ solid, 60-79 decent, below 60 notable gaps.
+- If a section genuinely has nothing (e.g. no endorsements found), return an empty array — do not make things up.
+- Everything must come from the document. No generic insurance knowledge substituted for actual policy content.`;
 
 app.post('/analyze', async (req, res) => {
   try {
@@ -61,13 +92,13 @@ app.post('/analyze', async (req, res) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2500,
+        max_tokens: 3500,
         system: SYSTEM,
         messages: [{
           role: 'user',
           content: [
             { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
-            { type: 'text', text: 'Analyze this insurance policy. Return ONLY the JSON object.' }
+            { type: 'text', text: 'Read this insurance policy carefully and generate the full dashboard JSON. Every finding must come directly from this document. Return ONLY the JSON object.' }
           ]
         }]
       })
@@ -114,6 +145,8 @@ app.post('/rebuild', async (req, res) => {
       else if (zip >= 48000 && zip <= 49999) { rebuildRatio = 0.65; regionName = 'Michigan'; }
       else if (zip >= 55000 && zip <= 56999) { rebuildRatio = 0.67; regionName = 'Minnesota'; }
       else if (zip >= 19000 && zip <= 19999) { rebuildRatio = 0.75; regionName = 'Pennsylvania'; }
+      else if (zip >= 90200 && zip <= 90299) { rebuildRatio = 0.88; regionName = 'Los Angeles area'; }
+      else if (zip >= 92000 && zip <= 92999) { rebuildRatio = 0.86; regionName = 'San Diego area'; }
     }
 
     let finishMultiplier = 1.0;
