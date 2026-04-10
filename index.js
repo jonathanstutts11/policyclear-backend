@@ -21,7 +21,7 @@ Return ONLY valid JSON — no markdown, no backticks, nothing else.
   "deductible": "$X,XXX",
   "dwellingCoverage": 400000,
   "finishLevel": "Builder-grade (standard finishes) OR Mid-range (upgraded finishes) OR High-end (custom/luxury finishes) OR Not specified",
-  "coverageSummary": "2-3 sentences max. Plain English. Tell them what this policy does for them. Use 'you' and 'your'. No jargon.",
+  "coverageSummary": "3-5 sentences. Be specific — use the actual dollar amounts, coverage names, and location from the policy. Write directly to the policyholder using 'you' and 'your'. This should read like a knowledgeable friend summarizing exactly what they have. Include the key coverage limits (dwelling, liability, personal property, loss of use etc). No jargon.",
   "scenarios": [
     {
       "title": "Short title — 3 words max",
