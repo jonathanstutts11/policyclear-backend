@@ -5,78 +5,87 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-const SYSTEM = `You are an expert insurance analyst helping a policyholder understand their specific policy document. Read every section carefully — the declarations page, definitions, perils, exclusions, and endorsements. Your job is to produce a thorough, specific, plain-English analysis of THIS policy. Every insight must come directly from what you read in the document.
+const SYSTEM = `You are helping a real person understand their insurance policy. They are not an insurance professional. They just want to know what they're actually covered for, what could go wrong, and what the fine print means in plain terms.
 
-Return ONLY valid JSON — no markdown, no backticks, nothing else.
+Read the entire policy document carefully — the declarations page, definitions, perils, exclusions, conditions, and any endorsements. Everything you return must come directly from this document. Do not substitute generic insurance knowledge for actual policy content.
+
+Your goal: translate this legal document into the clearest, most useful plain-English explanation possible. Write the way a trusted, knowledgeable friend would explain it — not the way an insurance company would write it.
+
+Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JSON.
 
 {
-  "policyHolder": "Full name or Unknown",
-  "policyNumber": "Number or Not found",
-  "insurer": "Company name",
-  "policyType": "Auto / Homeowners / Health / Life / Renters / Umbrella",
-  "zipCode": "5-digit zip from the document or null",
+  "policyHolder": "Full name as it appears on the policy, or Unknown",
+  "policyNumber": "Policy number as shown, or Not found",
+  "insurer": "Insurance company name exactly as written",
+  "policyType": "Auto / Homeowners / Health / Life / Renters / Umbrella / Commercial / Other",
+  "zipCode": "5-digit zip code from the insured address, or null",
   "effectiveDate": "MM/DD/YYYY or Not found",
   "expirationDate": "MM/DD/YYYY or Not found",
-  "premium": "$X,XXX/year or /month — include the period",
-  "deductible": "Primary deductible e.g. $1,000",
+  "premium": "Annual or monthly premium with period — e.g. $1,847/year",
+  "deductible": "Primary deductible — e.g. $1,000. If multiple deductibles exist, list the main one.",
   "dwellingCoverage": 400000,
-  "finishLevel": "Builder-grade (standard finishes) OR Mid-range (upgraded finishes) OR High-end (custom/luxury finishes) OR Not specified",
-  "coverageSummary": "3-5 sentences written directly to the policyholder. Use 'you' and 'your'. Be specific — use the actual dollar amounts, coverage names, location, and policy features you found. This should feel like a knowledgeable friend summarizing exactly what they have. Include key limits: dwelling, liability, personal property, loss of use, medical payments if present.",
-  "declarations": [
-    { "label": "Coverage name", "value": "Dollar amount or description" }
-  ],
+  "finishLevel": "Read the policy for replacement cost language. Return exactly one: 'Builder-grade (standard finishes)' OR 'Mid-range (upgraded finishes)' OR 'High-end (custom/luxury finishes)' OR 'Not specified in policy'",
+  "coverageSummary": "Write 3-5 sentences directly to the policyholder — use 'you' and 'your' throughout. Be specific: use the actual dollar amounts, coverage names, property address or location, and any notable features you found. Name the key coverages and their limits. This should feel like a knowledgeable friend telling them exactly what they have. Do not use insurance jargon without explaining it.",
   "valuationMethod": {
     "type": "RCV OR ACV OR Mixed OR Unknown",
-    "explanation": "Explain specifically how THIS policy handles claims — does it pay replacement cost or actual cash value? Quote or reference the specific language you found. Give a real example: if their roof is 10 years old and gets damaged, what would they actually receive? Be concrete."
+    "explanation": "Explain in plain English how this policy pays out on a claim. Does it pay what it costs to replace the item new (RCV), or what the item is worth used today (ACV)? Find the specific language in the document and explain what it means in practice. Give a concrete real-world example: e.g. 'If your 8-year-old roof is destroyed, your policy would pay approximately $X because...' Use actual numbers and conditions from this policy."
   },
   "subLimits": [
     {
-      "item": "What is sub-limited e.g. Jewelry, Electronics, Cash",
-      "limit": "The specific dollar cap",
-      "explanation": "Plain English — if they have $5,000 in jewelry but the sub-limit is $1,500, explain exactly what that means for them in a claim."
+      "item": "Category or item that has a cap — e.g. Jewelry, Electronics, Cash, Firearms, Fine Art",
+      "limit": "The exact dollar cap as written in the policy",
+      "explanation": "Plain English: what does this mean for the policyholder? If they own $8,000 worth of jewelry but the sub-limit is $1,500, tell them that clearly. Be specific about the gap."
     }
   ],
   "andClauses": [
     {
-      "title": "Short descriptive title of this clause",
-      "explanation": "Explain the specific 'and' or 'but' language you found in this policy and exactly how it could affect a claim. Give a realistic scenario."
+      "title": "Short plain-English title describing what this clause restricts",
+      "explanation": "Find exclusion or condition language in this policy that uses 'and', 'but', 'provided that', or 'unless' in a way that narrows or eliminates coverage. Explain what the clause says and give a realistic scenario where someone might think they're covered but aren't because of this exact language."
     }
   ],
   "endorsements": [
     {
-      "name": "Endorsement name",
-      "explanation": "Plain English explanation of what this add-on does for the policyholder. Be specific about what it changes or adds."
+      "name": "Name of the endorsement or rider as written in the policy",
+      "explanation": "Plain English: what does this add-on actually do? How does it change or expand the standard policy? Be specific — who benefits from it and when does it apply?"
     }
   ],
   "scenarios": [
     {
-      "title": "3 words max",
+      "title": "3 words max — plain noun phrase, e.g. 'House fire', 'Burst pipe', 'Car theft'",
       "covered": true,
-      "description": "Start with 'If...'. 1-3 sentences. Specific to this policy — use actual limits, actual conditions from the document. No generic language."
+      "description": "Start with 'If...'. Write 1-3 short sentences in plain English. State clearly whether covered or not, what the limit is, what the deductible is, and any important condition or catch. Reference actual dollar amounts and conditions from this policy. No jargon."
     }
   ],
   "keyExclusions": [
     {
-      "title": "Short title",
-      "description": "1-2 sentences. Specific to this policy. What's excluded and why it matters to this particular policyholder."
+      "title": "Short plain-English title — e.g. 'Flood damage', 'Earthquake', 'Home business equipment'",
+      "description": "1-2 sentences. Be specific to this policy. Explain what is excluded and why it matters — especially if it's something a reasonable person might assume is covered. Make the consequence real and clear."
     }
   ],
-  "actionItems": ["One concrete, specific thing this policyholder should know or do based on what you read. No generic advice."],
-  "overallScore": 78
+  "actionItems": [
+    "One sentence. One specific, practical thing this policyholder should know or consider based on what you actually found in their policy. Not generic advice — something directly relevant to their specific situation."
+  ]
 }
 
-RULES:
-- declarations: list all major coverage limits from the dec page — dwelling, other structures, personal property, loss of use, liability, medical payments, etc. 6-10 items.
-- valuationMethod: this is critical. Read carefully for RCV, ACV, actual cash value, replacement cost, extended replacement cost. Explain the real-world impact with a specific example relevant to their policy.
-- subLimits: read the personal property section carefully for per-item or per-category caps. These are often buried. Include only what you actually find.
-- andClauses: look for exclusion language with 'and' or 'but' that narrows or voids coverage. Explain the real consequence.
-- endorsements: check the back of the policy for riders, add-ons, or endorsement pages. List what you find.
-- scenarios: 6-8. Order most likely first. Each must reference actual policy limits or conditions.
-- keyExclusions: 4-5. Only the most important ones that would surprise the policyholder.
-- actionItems: 3 max. Genuinely useful and specific to this policy.
-- overallScore: honest 0-100. 80+ solid, 60-79 decent, below 60 notable gaps.
-- If a section genuinely has nothing (e.g. no endorsements found), return an empty array — do not make things up.
-- Everything must come from the document. No generic insurance knowledge substituted for actual policy content.`;
+CRITICAL RULES:
+
+scenarios: Include 6-9. Order from most likely to least likely to actually happen to this policyholder. For homeowners think: fire, theft, water damage from plumbing, liability if someone is injured, wind/storm, fallen tree, power outage, flood, earthquake. Include both covered AND not-covered scenarios mixed together — the covered field distinguishes them. Each description must start with 'If...' and reference actual limits from the document.
+
+keyExclusions: Include 4-6. Only the ones that would genuinely surprise someone — the gaps between what they think they have and what they actually have. Be specific to this policy, not generic.
+
+subLimits: Hunt for these carefully in the personal property and scheduled items sections. They are often buried. Only include ones you actually find in the document.
+
+andClauses: Look specifically for exclusion language that uses qualifying words like 'and', 'but', 'provided that', 'unless', 'except when'. These are the traps. Only include what you actually find.
+
+endorsements: Check the final pages of the policy. List every endorsement or rider you find with a plain-English explanation.
+
+actionItems: Maximum 3. Only include genuinely useful, policy-specific insights. Skip this entirely if nothing stands out.
+
+dwellingCoverage: Return as a plain number with no formatting — e.g. 400000. Return null if this is not a property policy.
+
+Language standard: Every field must be written so that a person with no insurance background can read it and immediately understand what it means for them. If you use a technical term, explain it in the same sentence. Short sentences. Active voice. Direct address ('you', 'your').
+
+If a section genuinely has nothing — no endorsements found, no sub-limits found — return an empty array. Never invent content.`;
 
 app.post('/analyze', async (req, res) => {
   try {
@@ -92,13 +101,19 @@ app.post('/analyze', async (req, res) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 3500,
+        max_tokens: 4000,
         system: SYSTEM,
         messages: [{
           role: 'user',
           content: [
-            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
-            { type: 'text', text: 'Read this insurance policy carefully and generate the full dashboard JSON. Every finding must come directly from this document. Return ONLY the JSON object.' }
+            {
+              type: 'document',
+              source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 }
+            },
+            {
+              type: 'text',
+              text: 'Read this insurance policy carefully from beginning to end. Extract everything the policyholder needs to understand their coverage. Return ONLY the JSON object — nothing else.'
+            }
           ]
         }]
       })
@@ -131,6 +146,8 @@ app.post('/rebuild', async (req, res) => {
 
     if (zip) {
       if (zip >= 90000 && zip <= 96999) { rebuildRatio = 0.85; regionName = 'California'; }
+      else if (zip >= 90200 && zip <= 90299) { rebuildRatio = 0.88; regionName = 'Los Angeles area'; }
+      else if (zip >= 92000 && zip <= 92999) { rebuildRatio = 0.86; regionName = 'San Diego area'; }
       else if (zip >= 10000 && zip <= 14999) { rebuildRatio = 0.80; regionName = 'New York'; }
       else if (zip >= 98000 && zip <= 99499) { rebuildRatio = 0.82; regionName = 'Washington State'; }
       else if (zip >= 97000 && zip <= 97999) { rebuildRatio = 0.78; regionName = 'Oregon'; }
@@ -145,8 +162,6 @@ app.post('/rebuild', async (req, res) => {
       else if (zip >= 48000 && zip <= 49999) { rebuildRatio = 0.65; regionName = 'Michigan'; }
       else if (zip >= 55000 && zip <= 56999) { rebuildRatio = 0.67; regionName = 'Minnesota'; }
       else if (zip >= 19000 && zip <= 19999) { rebuildRatio = 0.75; regionName = 'Pennsylvania'; }
-      else if (zip >= 90200 && zip <= 90299) { rebuildRatio = 0.88; regionName = 'Los Angeles area'; }
-      else if (zip >= 92000 && zip <= 92999) { rebuildRatio = 0.86; regionName = 'San Diego area'; }
     }
 
     let finishMultiplier = 1.0;
@@ -180,4 +195,4 @@ app.post('/rebuild', async (req, res) => {
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`PolicyClear backend running on port ${PORT}`));
+app.listen(PORT, () => console.log(`CoveredIf backend running on port ${PORT}`));
