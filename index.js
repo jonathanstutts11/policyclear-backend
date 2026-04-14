@@ -18,6 +18,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "policyNumber": "Policy number as shown, or Not found",
   "insurer": "Insurance company name exactly as written",
   "policyType": "Homeowners / Umbrella / Condo / Renters / Dwelling Fire — return the most accurate description based on what you read",
+  "propertyAddress": "Full insured property address as shown on the declarations page, or null if not found",
   "zipCode": "5-digit zip code from the insured address, or null",
   "effectiveDate": "MM/DD/YYYY or Not found",
   "expirationDate": "MM/DD/YYYY or Not found",
@@ -25,7 +26,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "deductible": "Primary deductible — e.g. $1,000. If multiple deductibles exist, list the main one.",
   "dwellingCoverage": 400000,
   "finishLevel": "Read the policy for replacement cost language. Return exactly one: 'Builder-grade (standard finishes)' OR 'Mid-range (upgraded finishes)' OR 'High-end (custom/luxury finishes)' OR 'Not specified in policy'",
-  "coverageSummary": "Write 3-5 sentences directly to the policyholder — use 'you' and 'your' throughout. Be specific: use the actual dollar amounts, coverage names, property address or location, and any notable features you found. Name the key coverages and their limits. This should feel like a knowledgeable friend telling them exactly what they have. Do not use insurance jargon without explaining it.",
+  "coverageSummary": "Write 3-5 sentences directly to the policyholder — use 'you' and 'your' throughout. Be specific: use the actual dollar amounts, coverage names, and any notable features you found. Name the key coverages and their limits. Do not repeat the property address here — it is shown separately. This should feel like a knowledgeable friend telling them exactly what they have. Do not use insurance jargon without explaining it.",
   "valuationMethod": {
     "type": "RCV OR ACV OR Mixed OR Unknown",
     "explanation": "Explain in plain English how this policy pays out on a claim. Does it pay what it costs to replace the item new (RCV), or what the item is worth used today (ACV)? Find the specific language in the document and explain what it means in practice. Give a concrete real-world example using actual numbers and conditions from this policy — e.g. what would happen to a 10-year-old roof that gets destroyed."
