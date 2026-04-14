@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-const SYSTEM = `You are helping a real person understand their insurance policy. They are not an insurance professional. They just want to know what they're actually covered for, what could go wrong, and what the fine print means in plain terms.
+const SYSTEM = `You are helping a real person understand their homeowners or umbrella insurance policy. They are not an insurance professional. They just want to know what they're actually covered for, what could go wrong, and what the fine print means in plain terms.
 
 Read the entire policy document carefully — the declarations page, definitions, perils, exclusions, conditions, and any endorsements. Everything you return must come directly from this document. Do not substitute generic insurance knowledge for actual policy content.
 
@@ -17,7 +17,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "policyHolder": "Full name as it appears on the policy, or Unknown",
   "policyNumber": "Policy number as shown, or Not found",
   "insurer": "Insurance company name exactly as written",
-  "policyType": "Auto / Homeowners / Health / Life / Renters / Umbrella / Commercial / Other",
+  "policyType": "Homeowners / Umbrella / Condo / Renters / Dwelling Fire — return the most accurate description based on what you read",
   "zipCode": "5-digit zip code from the insured address, or null",
   "effectiveDate": "MM/DD/YYYY or Not found",
   "expirationDate": "MM/DD/YYYY or Not found",
@@ -28,19 +28,19 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "coverageSummary": "Write 3-5 sentences directly to the policyholder — use 'you' and 'your' throughout. Be specific: use the actual dollar amounts, coverage names, property address or location, and any notable features you found. Name the key coverages and their limits. This should feel like a knowledgeable friend telling them exactly what they have. Do not use insurance jargon without explaining it.",
   "valuationMethod": {
     "type": "RCV OR ACV OR Mixed OR Unknown",
-    "explanation": "Explain in plain English how this policy pays out on a claim. Does it pay what it costs to replace the item new (RCV), or what the item is worth used today (ACV)? Find the specific language in the document and explain what it means in practice. Give a concrete real-world example: e.g. 'If your 8-year-old roof is destroyed, your policy would pay approximately $X because...' Use actual numbers and conditions from this policy."
+    "explanation": "Explain in plain English how this policy pays out on a claim. Does it pay what it costs to replace the item new (RCV), or what the item is worth used today (ACV)? Find the specific language in the document and explain what it means in practice. Give a concrete real-world example using actual numbers and conditions from this policy — e.g. what would happen to a 10-year-old roof that gets destroyed."
   },
   "subLimits": [
     {
-      "item": "Category or item that has a cap — e.g. Jewelry, Electronics, Cash, Firearms, Fine Art",
+      "item": "Category or item that has a cap — e.g. Jewelry, Electronics, Cash, Firearms, Fine Art, Business Property, Watercraft",
       "limit": "The exact dollar cap as written in the policy",
-      "explanation": "Plain English: what does this mean for the policyholder? If they own $8,000 worth of jewelry but the sub-limit is $1,500, tell them that clearly. Be specific about the gap."
+      "explanation": "Plain English: what does this mean for the policyholder? If they own $8,000 worth of jewelry but the sub-limit is $1,500, tell them that clearly. Be specific about the gap and what they should do about it."
     }
   ],
   "andClauses": [
     {
       "title": "Short plain-English title describing what this clause restricts",
-      "explanation": "Find exclusion or condition language in this policy that uses 'and', 'but', 'provided that', or 'unless' in a way that narrows or eliminates coverage. Explain what the clause says and give a realistic scenario where someone might think they're covered but aren't because of this exact language."
+      "explanation": "Find exclusion or condition language in this policy that uses qualifying words like 'and', 'but', 'provided that', 'unless', 'except when' in a way that narrows or eliminates coverage. Explain what the clause says and give a realistic scenario where someone might think they're covered but aren't because of this exact language."
     }
   ],
   "endorsements": [
@@ -51,9 +51,9 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   ],
   "scenarios": [
     {
-      "title": "3 words max — plain noun phrase, e.g. 'House fire', 'Burst pipe', 'Car theft'",
+      "title": "3 words max — plain noun phrase e.g. 'House fire', 'Burst pipe', 'Car theft'",
       "covered": true,
-      "description": "Start with 'If...'. Write 1-3 short sentences in plain English. State clearly whether covered or not, what the limit is, what the deductible is, and any important condition or catch. Reference actual dollar amounts and conditions from this policy. No jargon."
+      "description": "Start with 'If...'. Write 1-3 short sentences in plain English. State clearly whether covered or not, what the limit is, what the deductible applies, and any important condition or catch. Reference actual dollar amounts and conditions from this policy. No jargon."
     }
   ],
   "keyExclusions": [
@@ -71,19 +71,21 @@ CRITICAL RULES:
 
 scenarios: Include 6-9. Order from most likely to least likely to actually happen to this policyholder. For homeowners think: fire, theft, water damage from plumbing, liability if someone is injured, wind/storm, fallen tree, power outage, flood, earthquake. Include both covered AND not-covered scenarios mixed together — the covered field distinguishes them. Each description must start with 'If...' and reference actual limits from the document.
 
-keyExclusions: Include 4-6. Only the ones that would genuinely surprise someone — the gaps between what they think they have and what they actually have. Be specific to this policy, not generic.
+DEDUPLICATION — CRITICAL: Every scenario title and every exclusion title must be unique. Never list the same peril or event twice even with slightly different wording. Before finalizing your response, review all scenario titles and all exclusion titles and remove any duplicates. 'Flood damage' and 'Flood' are duplicates — keep only one. 'Earthquake' and 'Earthquake damage' are duplicates — keep only one.
 
-subLimits: Hunt for these carefully in the personal property and scheduled items sections. They are often buried. Only include ones you actually find in the document.
+keyExclusions: Include 4-6. Only exclusions that are realistic and relevant to this policyholder's actual situation. DO NOT include exclusions for events that are essentially impossible in normal life — such as nuclear hazard, war, government seizure, or ordinance of law unless it is directly relevant to something found in this specific policy. Focus on exclusions the policyholder might genuinely encounter or mistakenly assume are covered — flood, earthquake, sewer backup, home business, short-term rental, vacant property, intentional acts, and similar real-world gaps.
 
-andClauses: Look specifically for exclusion language that uses qualifying words like 'and', 'but', 'provided that', 'unless', 'except when'. These are the traps. Only include what you actually find.
+subLimits: Hunt carefully in the personal property, scheduled items, and special limits sections. Common sub-limits include: jewelry and watches, firearms, cash and bank notes, securities, silverware, electronics, business property, watercraft, trailers, and fine arts. If you find them, list them. Only include what you actually find in the document.
 
-endorsements: Check the final pages of the policy. List every endorsement or rider you find with a plain-English explanation.
+andClauses: Look specifically for exclusion or condition language that uses qualifying words that narrow coverage in ways a layperson would miss. These are the traps. Common ones: 'sudden and accidental' (excludes gradual damage), 'residence premises' restrictions, vacancy clauses, business use exclusions. Only include what you actually find.
 
-actionItems: Maximum 3. Only include genuinely useful, policy-specific insights. Skip this entirely if nothing stands out.
+endorsements: Check the final pages of the policy carefully. List every endorsement or rider with a plain-English explanation of what it adds or changes.
 
-dwellingCoverage: Return as a plain number with no formatting — e.g. 400000. Return null if this is not a property policy.
+actionItems: Maximum 3. Only include genuinely useful, policy-specific insights. These should feel like advice from a friend who just read the whole policy — specific, practical, and relevant to THIS person's situation.
 
-Language standard: Every field must be written so that a person with no insurance background can read it and immediately understand what it means for them. If you use a technical term, explain it in the same sentence. Short sentences. Active voice. Direct address ('you', 'your').
+dwellingCoverage: Return as a plain number with no formatting — e.g. 400000. Return null if not a property policy.
+
+Language standard: Every field must be written so that a person with no insurance background can read it and immediately understand what it means for them. Short sentences. Active voice. Direct address.
 
 If a section genuinely has nothing — no endorsements found, no sub-limits found — return an empty array. Never invent content.`;
 
@@ -112,7 +114,7 @@ app.post('/analyze', async (req, res) => {
             },
             {
               type: 'text',
-              text: 'Read this insurance policy carefully from beginning to end. Extract everything the policyholder needs to understand their coverage. Return ONLY the JSON object — nothing else.'
+              text: 'Read this insurance policy carefully from beginning to end. Extract everything the policyholder needs to understand their coverage. Remember: deduplicate all scenario titles and exclusion titles before returning. Return ONLY the JSON object — nothing else.'
             }
           ]
         }]
@@ -127,6 +129,21 @@ app.post('/analyze', async (req, res) => {
     const data = await response.json();
     const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
     const policy = JSON.parse(raw);
+
+    // Frontend safety net: deduplicate scenarios and exclusions by normalized title
+    const dedup = (arr) => {
+      if (!Array.isArray(arr)) return arr;
+      const seen = new Set();
+      return arr.filter(item => {
+        const key = (item.title || item).toLowerCase().replace(/[^a-z]/g, '');
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    };
+    policy.scenarios = dedup(policy.scenarios);
+    policy.keyExclusions = dedup(policy.keyExclusions);
+
     res.json(policy);
 
   } catch (err) {
@@ -145,8 +162,8 @@ app.post('/rebuild', async (req, res) => {
     let regionName = 'your area';
 
     if (zip) {
-      if (zip >= 90000 && zip <= 96999) { rebuildRatio = 0.85; regionName = 'California'; }
-      else if (zip >= 90200 && zip <= 90299) { rebuildRatio = 0.88; regionName = 'Los Angeles area'; }
+      if (zip >= 90200 && zip <= 90299) { rebuildRatio = 0.88; regionName = 'Los Angeles area'; }
+      else if (zip >= 90000 && zip <= 96999) { rebuildRatio = 0.85; regionName = 'California'; }
       else if (zip >= 92000 && zip <= 92999) { rebuildRatio = 0.86; regionName = 'San Diego area'; }
       else if (zip >= 10000 && zip <= 14999) { rebuildRatio = 0.80; regionName = 'New York'; }
       else if (zip >= 98000 && zip <= 99499) { rebuildRatio = 0.82; regionName = 'Washington State'; }
@@ -178,10 +195,7 @@ app.post('/rebuild', async (req, res) => {
     else if (gap > -10000) status = 'close';
 
     res.json({
-      status,
-      regionName,
-      estimatedRebuild,
-      coverage,
+      status, regionName, estimatedRebuild, coverage,
       finishLevel: finishLevel || 'Not specified',
       lowGap: gap > 0 ? Math.round(gap * 0.85 / 5000) * 5000 : 0,
       highGap: gap > 0 ? Math.round(gap * 1.15 / 5000) * 5000 : 0
