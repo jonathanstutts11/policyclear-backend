@@ -20,6 +20,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "policyType": "Homeowners / Umbrella / Condo / Renters / Dwelling Fire — return the most accurate description based on what you read",
   "propertyAddress": "Full insured property address as shown on the declarations page, or null if not found",
   "zipCode": "5-digit zip code from the insured address, or null",
+  "squareFootage": "Living area square footage of the home as shown on the declarations page or elsewhere in the document — return as a number only e.g. 2100, or null if not found",
   "effectiveDate": "MM/DD/YYYY or Not found",
   "expirationDate": "MM/DD/YYYY or Not found",
   "premium": "Annual or monthly premium with period — e.g. $1,847/year",
@@ -100,12 +101,19 @@ app.post('/analyze', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'prompt-caching-2024-07-31'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
-        system: SYSTEM,
+        system: [
+          {
+            type: 'text',
+            text: SYSTEM,
+            cache_control: { type: 'ephemeral' }
+          }
+        ],
         messages: [{
           role: 'user',
           content: [
@@ -155,49 +163,91 @@ app.post('/analyze', async (req, res) => {
 
 app.post('/rebuild', async (req, res) => {
   try {
-    const { homeValue, dwellingCoverage, zipCode, finishLevel } = req.body;
+    const { homeValue, dwellingCoverage, zipCode, finishLevel, squareFootage } = req.body;
     if (!homeValue || !dwellingCoverage) return res.status(400).json({ error: 'Missing required fields' });
 
     const zip = zipCode ? parseInt(zipCode) : null;
-    let rebuildRatio = 0.70;
+
+    // Per sq ft rebuild cost ranges by region [low, mid, high] in dollars
+    let costLow = 180, costMid = 250, costHigh = 380;
     let regionName = 'your area';
 
     if (zip) {
-      if (zip >= 90200 && zip <= 90299) { rebuildRatio = 0.88; regionName = 'Los Angeles area'; }
-      else if (zip >= 90000 && zip <= 96999) { rebuildRatio = 0.85; regionName = 'California'; }
-      else if (zip >= 92000 && zip <= 92999) { rebuildRatio = 0.86; regionName = 'San Diego area'; }
-      else if (zip >= 10000 && zip <= 14999) { rebuildRatio = 0.80; regionName = 'New York'; }
-      else if (zip >= 98000 && zip <= 99499) { rebuildRatio = 0.82; regionName = 'Washington State'; }
-      else if (zip >= 97000 && zip <= 97999) { rebuildRatio = 0.78; regionName = 'Oregon'; }
-      else if (zip >= 80000 && zip <= 81999) { rebuildRatio = 0.75; regionName = 'Colorado'; }
-      else if (zip >= 33000 && zip <= 34999) { rebuildRatio = 0.72; regionName = 'Florida'; }
-      else if (zip >= 60000 && zip <= 62999) { rebuildRatio = 0.68; regionName = 'Illinois'; }
-      else if (zip >= 77000 && zip <= 79999) { rebuildRatio = 0.65; regionName = 'Texas'; }
-      else if (zip >= 78000 && zip <= 78999) { rebuildRatio = 0.65; regionName = 'Texas'; }
-      else if (zip >= 30000 && zip <= 31999) { rebuildRatio = 0.65; regionName = 'Georgia'; }
-      else if (zip >= 85000 && zip <= 86999) { rebuildRatio = 0.70; regionName = 'Arizona'; }
-      else if (zip >= 20000 && zip <= 20599) { rebuildRatio = 0.82; regionName = 'DC area'; }
-      else if (zip >= 48000 && zip <= 49999) { rebuildRatio = 0.65; regionName = 'Michigan'; }
-      else if (zip >= 55000 && zip <= 56999) { rebuildRatio = 0.67; regionName = 'Minnesota'; }
-      else if (zip >= 19000 && zip <= 19999) { rebuildRatio = 0.75; regionName = 'Pennsylvania'; }
+      if (zip >= 90200 && zip <= 90299) { costLow=320; costMid=450; costHigh=650; regionName='Los Angeles area'; }
+      else if (zip >= 90000 && zip <= 96999) { costLow=280; costMid=400; costHigh=580; regionName='California'; }
+      else if (zip >= 92000 && zip <= 92999) { costLow=300; costMid=420; costHigh=600; regionName='San Diego area'; }
+      else if (zip >= 10000 && zip <= 14999) { costLow=260; costMid=370; costHigh=520; regionName='New York'; }
+      else if (zip >= 98000 && zip <= 99499) { costLow=240; costMid=340; costHigh=480; regionName='Washington State'; }
+      else if (zip >= 97000 && zip <= 97999) { costLow=220; costMid=310; costHigh=440; regionName='Oregon'; }
+      else if (zip >= 80000 && zip <= 81999) { costLow=200; costMid=285; costHigh=400; regionName='Colorado'; }
+      else if (zip >= 33000 && zip <= 34999) { costLow=190; costMid=270; costHigh=380; regionName='Florida'; }
+      else if (zip >= 60000 && zip <= 62999) { costLow=175; costMid=245; costHigh=345; regionName='Illinois'; }
+      else if (zip >= 77000 && zip <= 79999) { costLow=165; costMid=230; costHigh=320; regionName='Texas'; }
+      else if (zip >= 78000 && zip <= 78999) { costLow=165; costMid=230; costHigh=320; regionName='Texas'; }
+      else if (zip >= 30000 && zip <= 31999) { costLow=160; costMid=225; costHigh=315; regionName='Georgia'; }
+      else if (zip >= 85000 && zip <= 86999) { costLow=175; costMid=245; costHigh=345; regionName='Arizona'; }
+      else if (zip >= 20000 && zip <= 20599) { costLow=250; costMid=350; costHigh=490; regionName='DC area'; }
+      else if (zip >= 48000 && zip <= 49999) { costLow=160; costMid=225; costHigh=315; regionName='Michigan'; }
+      else if (zip >= 55000 && zip <= 56999) { costLow=165; costMid=235; costHigh=330; regionName='Minnesota'; }
+      else if (zip >= 19000 && zip <= 19999) { costLow=200; costMid=285; costHigh=400; regionName='Pennsylvania'; }
     }
 
+    // Adjust for finish level
     let finishMultiplier = 1.0;
-    if (finishLevel?.includes('Mid-range')) finishMultiplier = 1.15;
-    if (finishLevel?.includes('High-end')) finishMultiplier = 1.40;
+    let finishLabel = 'standard';
+    if (finishLevel?.includes('Mid-range')) { finishMultiplier = 1.15; finishLabel = 'mid-range'; }
+    if (finishLevel?.includes('High-end')) { finishMultiplier = 1.40; finishLabel = 'high-end'; }
 
-    const hv = parseInt(homeValue);
-    const estimatedRebuild = Math.round(hv * rebuildRatio * finishMultiplier);
     const coverage = parseInt(dwellingCoverage);
-    const gap = estimatedRebuild - coverage;
+    const sqft = squareFootage ? parseInt(squareFootage) : null;
 
+    let estimatedRebuildLow, estimatedRebuildHigh, estimatedRebuild, usedSqft = false;
+
+    if (sqft && sqft > 200 && sqft < 20000) {
+      // Use sq footage method — more transparent
+      estimatedRebuildLow = Math.round(sqft * costLow * finishMultiplier);
+      estimatedRebuildHigh = Math.round(sqft * costHigh * finishMultiplier);
+      estimatedRebuild = Math.round(sqft * costMid * finishMultiplier);
+      usedSqft = true;
+    } else {
+      // Fall back to home value ratio method
+      const hv = parseInt(homeValue);
+      let rebuildRatio = 0.70;
+      if (zip) {
+        if (zip >= 90200 && zip <= 90299) rebuildRatio = 0.88;
+        else if (zip >= 90000 && zip <= 96999) rebuildRatio = 0.85;
+        else if (zip >= 92000 && zip <= 92999) rebuildRatio = 0.86;
+        else if (zip >= 10000 && zip <= 14999) rebuildRatio = 0.80;
+        else if (zip >= 98000 && zip <= 99499) rebuildRatio = 0.82;
+        else if (zip >= 97000 && zip <= 97999) rebuildRatio = 0.78;
+        else if (zip >= 80000 && zip <= 81999) rebuildRatio = 0.75;
+        else if (zip >= 33000 && zip <= 34999) rebuildRatio = 0.72;
+        else if (zip >= 60000 && zip <= 62999) rebuildRatio = 0.68;
+        else if (zip >= 77000 && zip <= 79999) rebuildRatio = 0.65;
+        else if (zip >= 30000 && zip <= 31999) rebuildRatio = 0.65;
+        else if (zip >= 85000 && zip <= 86999) rebuildRatio = 0.70;
+        else if (zip >= 20000 && zip <= 20599) rebuildRatio = 0.82;
+        else if (zip >= 48000 && zip <= 49999) rebuildRatio = 0.65;
+        else if (zip >= 55000 && zip <= 56999) rebuildRatio = 0.67;
+        else if (zip >= 19000 && zip <= 19999) rebuildRatio = 0.75;
+      }
+      estimatedRebuild = Math.round(hv * rebuildRatio * finishMultiplier);
+      estimatedRebuildLow = Math.round(estimatedRebuild * 0.85);
+      estimatedRebuildHigh = Math.round(estimatedRebuild * 1.15);
+    }
+
+    const gap = estimatedRebuild - coverage;
     let status = 'adequate';
     if (gap > 10000) status = 'gap';
     else if (gap > -10000) status = 'close';
 
     res.json({
-      status, regionName, estimatedRebuild, coverage,
-      finishLevel: finishLevel || 'Not specified',
+      status, regionName, estimatedRebuild,
+      estimatedRebuildLow: Math.round(estimatedRebuildLow / 5000) * 5000,
+      estimatedRebuildHigh: Math.round(estimatedRebuildHigh / 5000) * 5000,
+      coverage, finishLevel: finishLevel || 'Not specified', finishLabel,
+      sqft: usedSqft ? sqft : null,
+      costLow, costMid, costHigh,
       lowGap: gap > 0 ? Math.round(gap * 0.85 / 5000) * 5000 : 0,
       highGap: gap > 0 ? Math.round(gap * 1.15 / 5000) * 5000 : 0
     });
