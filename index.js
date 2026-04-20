@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 app.use(cors());
@@ -259,13 +260,12 @@ app.post('/rebuild', async (req, res) => {
 
 app.post('/create-payment-intent', async (req, res) => {
   try {
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     const { amount } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount || 1499,
       currency: 'usd',
       description: 'CoveredIf Policy Analysis',
-      automatic_payment_methods: { enabled: true }
+      payment_method_types: ['card']
     });
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
