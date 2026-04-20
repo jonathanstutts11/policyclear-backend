@@ -257,6 +257,22 @@ app.post('/rebuild', async (req, res) => {
   }
 });
 
+app.post('/create-payment-intent', async (req, res) => {
+  try {
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const { amount } = req.body;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount || 1499,
+      currency: 'usd',
+      description: 'CoveredIf Policy Analysis',
+      automatic_payment_methods: { enabled: true }
+    });
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 3000;
