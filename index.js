@@ -73,7 +73,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
 
 CRITICAL RULES:
 
-scenarios: Produce 14-18 total. Order by likelihood of happening to this specific policyholder. Do NOT group all covered together then all not-covered — interleave them by likelihood. A correct ordering: House fire (covered) → Burst pipe (covered) → Flood damage (NOT covered) → Theft (covered) → Windstorm (covered) → Earthquake (NOT covered) → Tree falls (covered) → Mold damage (NOT covered). The frontend will separate them into two groups, so just produce them ordered by real-world probability. Every scenario gets identical description quality regardless of position — full plain-English with actual dollar amounts, starting with 'If...'
+scenarios: This is the most important section of the report. Be exhaustive — produce every meaningful scenario you can identify from this policy, typically 16-22 total. Read through every peril, every exclusion, every condition, and every endorsement and turn each one into a plain-English scenario. Do not curate or shortlist — the policyholder deserves to know everything. For each scenario, the covered field must be accurate and the description must start with 'If...' and explain clearly what happens, what the limit is, what the deductible is, and any important catch or condition. Use actual dollar amounts from the policy. Write as if explaining to someone who has never read an insurance policy. Covered scenarios should explain what they get. Not-covered scenarios should explain what they don't get and why it matters. Do not group all covered together then all not-covered — the frontend handles display grouping. Just produce them ordered by likelihood.
 
 DEDUPLICATION: Every scenario title and exclusion title must be unique. Never list the same event twice with slightly different wording. Review all titles before returning and remove duplicates.
 
@@ -108,7 +108,7 @@ app.post('/analyze', async (req, res) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
+        max_tokens: 6000,
         system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{
           role: 'user',
