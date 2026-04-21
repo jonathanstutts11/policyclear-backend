@@ -22,76 +22,76 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "propertyAddress": "Full insured property address as shown on the declarations page, or null if not found",
   "propertyCity": "City name only from the insured property address — e.g. 'Redondo Beach' or 'Austin'. Return just the city name, no state, no zip, no street. Or null if not found.",
   "zipCode": "5-digit zip code from the insured address, or null",
-  "squareFootage": "Living area square footage of the home as shown on the declarations page or elsewhere in the document — return as a number only e.g. 2100, or null if not found",
+  "squareFootage": "Living area square footage as shown in the document — return as a plain number e.g. 2100, or null if not found",
   "effectiveDate": "MM/DD/YYYY or Not found",
   "expirationDate": "MM/DD/YYYY or Not found",
   "premium": "Annual or monthly premium with period — e.g. $1,847/year",
-  "deductible": "Primary deductible — e.g. $1,000. If multiple deductibles exist, list the main one.",
+  "deductible": "Primary deductible — e.g. $1,000",
   "dwellingCoverage": 400000,
-  "finishLevel": "Read the policy for replacement cost language. Return exactly one: 'Builder-grade (standard finishes)' OR 'Mid-range (upgraded finishes)' OR 'High-end (custom/luxury finishes)' OR 'Not specified in policy'",
-  "coverageSummary": "Write 3-5 sentences directly to the policyholder — use 'you' and 'your' throughout. Be specific: use the actual dollar amounts, coverage names, and any notable features you found. Name the key coverages and their limits. Do not repeat the property address here — it is shown separately. This should feel like a knowledgeable friend telling them exactly what they have. Do not use insurance jargon without explaining it.",
+  "finishLevel": "Return exactly one: 'Builder-grade (standard finishes)' OR 'Mid-range (upgraded finishes)' OR 'High-end (custom/luxury finishes)' OR 'Not specified in policy'",
+  "coverageSummary": "Write 3-5 sentences directly to the policyholder using 'you' and 'your'. Be specific — use actual dollar amounts, coverage names, and notable features. Do not repeat the property address. Feel like a knowledgeable friend summarizing exactly what they have. No jargon without explanation.",
   "valuationMethod": {
     "type": "RCV OR ACV OR Mixed OR Unknown",
-    "explanation": "Explain in plain English how this policy pays out on a claim. Does it pay what it costs to replace the item new (RCV), or what the item is worth used today (ACV)? Find the specific language in the document and explain what it means in practice. Give a concrete real-world example using actual numbers and conditions from this policy — e.g. what would happen to a 10-year-old roof that gets destroyed."
+    "explanation": "Explain in plain English how this policy pays out on a claim. Give a concrete real-world example using actual numbers from this policy — e.g. what happens to a 10-year-old roof that gets destroyed."
   },
   "subLimits": [
     {
-      "item": "Category or item that has a cap — e.g. Jewelry, Electronics, Cash, Firearms, Fine Art, Business Property, Watercraft",
-      "limit": "The exact dollar cap as written in the policy",
-      "explanation": "Plain English: what does this mean for the policyholder? If they own $8,000 worth of jewelry but the sub-limit is $1,500, tell them that clearly. Be specific about the gap and what they should do about it."
+      "item": "Category with a cap — e.g. Jewelry, Electronics, Cash, Firearms, Fine Art, Business Property",
+      "limit": "The exact dollar cap as written",
+      "explanation": "Plain English: what does this mean? Be specific about the gap and what they should do about it."
     }
   ],
   "andClauses": [
     {
       "title": "Short plain-English title describing what this clause restricts",
-      "explanation": "Find exclusion or condition language in this policy that uses qualifying words like 'and', 'but', 'provided that', 'unless', 'except when' in a way that narrows or eliminates coverage. Explain what the clause says and give a realistic scenario where someone might think they're covered but aren't because of this exact language."
+      "explanation": "Explain the qualifying language and give a realistic scenario where someone thinks they're covered but isn't."
     }
   ],
   "endorsements": [
     {
-      "name": "Name of the endorsement or rider as written in the policy",
-      "explanation": "Plain English: what does this add-on actually do? How does it change or expand the standard policy? Be specific — who benefits from it and when does it apply?"
+      "name": "Endorsement name as written in the policy",
+      "explanation": "Plain English: what does this add-on do? Who benefits and when does it apply?"
     }
   ],
   "scenarios": [
     {
-      "title": "3 words max — plain noun phrase e.g. 'House fire', 'Burst pipe', 'Car theft'",
+      "title": "3 words max — e.g. 'House fire', 'Burst pipe', 'Flood damage'",
       "covered": true,
-      "description": "Start with 'If...'. Write 1-3 short sentences in plain English. State clearly whether covered or not, what the limit is, what the deductible applies, and any important condition or catch. Reference actual dollar amounts and conditions from this policy. No jargon."
+      "description": "Start with 'If...'. 1-3 short sentences. State whether covered or not, the limit, deductible, and any important catch. Use actual dollar amounts from this policy."
     }
   ],
   "keyExclusions": [
     {
-      "title": "Short plain-English title — e.g. 'Flood damage', 'Earthquake', 'Home business equipment'",
-      "description": "1-2 sentences. Be specific to this policy. Explain what is excluded and why it matters — especially if it's something a reasonable person might assume is covered. Make the consequence real and clear."
+      "title": "Short plain-English title",
+      "description": "1-2 sentences. What is excluded and why it matters to this specific policyholder."
     }
   ],
   "actionItems": [
-    "One sentence. One specific, practical thing this policyholder should know or consider based on what you actually found in their policy. Not generic advice — something directly relevant to their specific situation."
+    "One sentence. One specific, practical thing based on what you found in this policy. Not generic — relevant to this person's situation."
   ]
 }
 
 CRITICAL RULES:
 
-scenarios: Produce 14-18 scenarios total. Order them strictly by likelihood of happening to this specific policyholder — do NOT group all covered together then all not-covered. The ordering must reflect real-world probability regardless of coverage status. For example, a correct ordering might be: House fire (covered) → Burst pipe (covered) → Flood damage (NOT covered) → Theft (covered) → Windstorm (covered) → Earthquake (NOT covered) → Tree falls (covered) → Sewer backup (covered) → Mold damage (NOT covered). Notice how covered and not-covered are interleaved naturally because that reflects actual likelihood. A wrong ordering would be listing all covered scenarios first then all not-covered — never do this. Among the first 10 scenarios ensure at least 3 are not-covered and at least 4 are covered. Every scenario gets identical description quality — full plain-English explanation with actual dollar amounts and conditions from the policy, starting with 'If...'
+scenarios: Produce 14-18 total. Order by likelihood of happening to this specific policyholder. Do NOT group all covered together then all not-covered — interleave them by likelihood. A correct ordering: House fire (covered) → Burst pipe (covered) → Flood damage (NOT covered) → Theft (covered) → Windstorm (covered) → Earthquake (NOT covered) → Tree falls (covered) → Mold damage (NOT covered). The frontend will separate them into two groups, so just produce them ordered by real-world probability. Every scenario gets identical description quality regardless of position — full plain-English with actual dollar amounts, starting with 'If...'
 
-DEDUPLICATION — CRITICAL: Every scenario title and every exclusion title must be unique. Never list the same peril or event twice even with slightly different wording. Before finalizing your response, review all scenario titles and all exclusion titles and remove any duplicates. 'Flood damage' and 'Flood' are duplicates — keep only one. 'Earthquake' and 'Earthquake damage' are duplicates — keep only one.
+DEDUPLICATION: Every scenario title and exclusion title must be unique. Never list the same event twice with slightly different wording. Review all titles before returning and remove duplicates.
 
-keyExclusions: Include 4-6. Only exclusions that are realistic and relevant to this policyholder's actual situation. DO NOT include exclusions for events that are essentially impossible in normal life — such as nuclear hazard, war, government seizure, or ordinance of law unless it is directly relevant to something found in this specific policy. Focus on exclusions the policyholder might genuinely encounter or mistakenly assume are covered — flood, earthquake, sewer backup, home business, short-term rental, vacant property, intentional acts, and similar real-world gaps.
+keyExclusions: 4-6 realistic exclusions relevant to this policyholder. Skip impossible events like nuclear hazard, war, government seizure unless directly relevant. Focus on gaps the policyholder might actually encounter or mistakenly assume are covered.
 
-subLimits: Hunt carefully in the personal property, scheduled items, and special limits sections. Common sub-limits include: jewelry and watches, firearms, cash and bank notes, securities, silverware, electronics, business property, watercraft, trailers, and fine arts. If you find them, list them. Only include what you actually find in the document.
+subLimits: Hunt carefully in personal property and scheduled items sections. Common ones: jewelry, watches, firearms, cash, securities, silverware, electronics, business property, watercraft, fine arts. Only include what you actually find.
 
-andClauses: Look specifically for exclusion or condition language that uses qualifying words that narrow coverage in ways a layperson would miss. These are the traps. Common ones: 'sudden and accidental' (excludes gradual damage), 'residence premises' restrictions, vacancy clauses, business use exclusions. Only include what you actually find.
+andClauses: Look for qualifying language like 'sudden and accidental', 'residence premises', vacancy clauses, business use exclusions that narrow coverage in ways a layperson would miss. Only include what you actually find.
 
-endorsements: Check the final pages of the policy carefully. List every endorsement or rider with a plain-English explanation of what it adds or changes.
+endorsements: Check final pages carefully. List every endorsement with a plain-English explanation.
 
-actionItems: Maximum 3. Only include genuinely useful, policy-specific insights. These should feel like advice from a friend who just read the whole policy — specific, practical, and relevant to THIS person's situation.
+actionItems: Maximum 3. Genuinely useful and specific to this policy.
 
-dwellingCoverage: Return as a plain number with no formatting — e.g. 400000. Return null if not a property policy.
+dwellingCoverage: Plain number, no formatting — e.g. 400000. Null if not a property policy.
 
-Language standard: Every field must be written so that a person with no insurance background can read it and immediately understand what it means for them. Short sentences. Active voice. Direct address.
+Language standard: Every field must be readable by someone with no insurance background. Short sentences. Active voice. Direct address.
 
-If a section genuinely has nothing — no endorsements found, no sub-limits found — return an empty array. Never invent content.`;
+If a section has nothing — return an empty array. Never invent content.`;
 
 app.post('/analyze', async (req, res) => {
   try {
@@ -109,24 +109,12 @@ app.post('/analyze', async (req, res) => {
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
-        system: [
-          {
-            type: 'text',
-            text: SYSTEM,
-            cache_control: { type: 'ephemeral' }
-          }
-        ],
+        system: [{ type: 'text', text: SYSTEM, cache_control: { type: 'ephemeral' } }],
         messages: [{
           role: 'user',
           content: [
-            {
-              type: 'document',
-              source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 }
-            },
-            {
-              type: 'text',
-              text: 'Read this insurance policy carefully from beginning to end. Extract everything the policyholder needs to understand their coverage. Remember: deduplicate all scenario titles and exclusion titles before returning. Return ONLY the JSON object — nothing else.'
-            }
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
+            { type: 'text', text: 'Read this insurance policy carefully from beginning to end. Extract everything the policyholder needs. Deduplicate all scenario and exclusion titles. Return ONLY the JSON object.' }
           ]
         }]
       })
@@ -141,8 +129,8 @@ app.post('/analyze', async (req, res) => {
     const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
     const policy = JSON.parse(raw);
 
-    // Frontend safety net: deduplicate scenarios and exclusions by normalized title
-    const dedup = (arr) => {
+    // Server-side dedup on scenarios and exclusions
+    const dedup = arr => {
       if (!Array.isArray(arr)) return arr;
       const seen = new Set();
       return arr.filter(item => {
@@ -156,7 +144,6 @@ app.post('/analyze', async (req, res) => {
     policy.keyExclusions = dedup(policy.keyExclusions);
 
     res.json(policy);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -169,10 +156,7 @@ app.post('/rebuild', async (req, res) => {
     if (!homeValue || !dwellingCoverage) return res.status(400).json({ error: 'Missing required fields' });
 
     const zip = zipCode ? parseInt(zipCode) : null;
-
-    // Per sq ft rebuild cost ranges by region [low, mid, high] in dollars
-    let costLow = 180, costMid = 250, costHigh = 380;
-    let regionName = 'your area';
+    let costLow = 180, costMid = 250, costHigh = 380, regionName = 'your area';
 
     if (zip) {
       if (zip >= 90200 && zip <= 90299) { costLow=320; costMid=450; costHigh=650; regionName='Los Angeles area'; }
@@ -194,25 +178,20 @@ app.post('/rebuild', async (req, res) => {
       else if (zip >= 19000 && zip <= 19999) { costLow=200; costMid=285; costHigh=400; regionName='Pennsylvania'; }
     }
 
-    // Adjust for finish level
-    let finishMultiplier = 1.0;
-    let finishLabel = 'standard';
+    let finishMultiplier = 1.0, finishLabel = 'standard';
     if (finishLevel?.includes('Mid-range')) { finishMultiplier = 1.15; finishLabel = 'mid-range'; }
     if (finishLevel?.includes('High-end')) { finishMultiplier = 1.40; finishLabel = 'high-end'; }
 
     const coverage = parseInt(dwellingCoverage);
     const sqft = squareFootage ? parseInt(squareFootage) : null;
-
-    let estimatedRebuildLow, estimatedRebuildHigh, estimatedRebuild, usedSqft = false;
+    let estimatedRebuild, estimatedRebuildLow, estimatedRebuildHigh, usedSqft = false;
 
     if (sqft && sqft > 200 && sqft < 20000) {
-      // Use sq footage method — more transparent
       estimatedRebuildLow = Math.round(sqft * costLow * finishMultiplier);
       estimatedRebuildHigh = Math.round(sqft * costHigh * finishMultiplier);
       estimatedRebuild = Math.round(sqft * costMid * finishMultiplier);
       usedSqft = true;
     } else {
-      // Fall back to home value ratio method
       const hv = parseInt(homeValue);
       let rebuildRatio = 0.70;
       if (zip) {
@@ -244,7 +223,7 @@ app.post('/rebuild', async (req, res) => {
     else if (gap > -10000) status = 'close';
 
     res.json({
-      status, 
+      status,
       regionName: propertyCity || regionName,
       estimatedRebuild,
       estimatedRebuildLow: Math.round(estimatedRebuildLow / 5000) * 5000,
@@ -255,7 +234,6 @@ app.post('/rebuild', async (req, res) => {
       lowGap: gap > 0 ? Math.round(gap * 0.85 / 5000) * 5000 : 0,
       highGap: gap > 0 ? Math.round(gap * 1.15 / 5000) * 5000 : 0
     });
-
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -265,7 +243,7 @@ app.post('/create-payment-intent', async (req, res) => {
   try {
     const { amount } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount || 1499,
+      amount: amount || 1500,
       currency: 'usd',
       description: 'CoveredIf Policy Analysis',
       payment_method_types: ['card']
@@ -276,100 +254,7 @@ app.post('/create-payment-intent', async (req, res) => {
   }
 });
 
-app.post('/audio-summary', async (req, res) => {
-  try {
-    const { policyData } = req.body;
-    if (!policyData) return res.status(400).json({ error: 'No policy data provided' });
-
-    // Build a rich, conversational audio script from the policy data
-    const d = policyData;
-    const name = d.policyHolder && d.policyHolder !== 'Unknown' ? d.policyHolder.split(' ')[0] : null;
-    const greeting = name ? `Here's a summary of ${name}'s policy.` : "Here's a summary of your policy.";
-
-    // Trim helper — keep descriptions concise for audio
-    const trim = (str, max=200) => str && str.length > max ? str.slice(0, str.lastIndexOf(' ', max)) + '.' : str;
-
-    const coveredScenarios = (d.scenarios || []).filter(s => s.covered).slice(0, 2);
-    const notCoveredScenarios = (d.scenarios || []).filter(s => !s.covered).slice(0, 1);
-    const topAction = d.actionItems && d.actionItems[0] ? d.actionItems[0] : null;
-    const hasGap = d.subLimits && d.subLimits.length > 0;
-
-    let script = `${greeting} `;
-    script += `${trim(d.coverageSummary, 300)} `;
-
-    if (coveredScenarios.length > 0) {
-      script += `Here are a couple of things you're covered for. `;
-      coveredScenarios.forEach(s => { script += `${trim(s.description)} `; });
-    }
-
-    if (notCoveredScenarios.length > 0) {
-      script += `One important gap to be aware of: `;
-      notCoveredScenarios.forEach(s => { script += `${trim(s.description)} `; });
-    }
-
-    if (d.valuationMethod && d.valuationMethod.explanation) {
-      script += `On how claims are paid: ${trim(d.valuationMethod.explanation, 200)} `;
-    }
-
-    if (hasGap) {
-      script += `Your policy also has sub-limits — dollar caps on categories like jewelry or electronics — worth reviewing in your full report. `;
-    }
-
-    if (topAction) {
-      script += `One key thing to act on: ${trim(topAction)} `;
-    }
-
-    script += `Your full CoveredIf report has all the details, including your insurer's ratings and a rebuild cost estimate for your property.`;
-
-    // Hard cap at 2000 characters for ElevenLabs free tier efficiency
-    if (script.length > 2000) script = script.slice(0, script.lastIndexOf(' ', 2000)) + '. Your full report has more details.';
-
-    if (topAction) {
-      script += `One key thing to act on: ${topAction} `;
-    }
-
-    script += `Your full CoveredIf report has all the details, including your insurer's ratings and a rebuild cost estimate for your property.`;
-
-    // Call ElevenLabs API — Rachel voice
-    const VOICE_ID = '21m00Tcm4TlvDq8ikWAM';
-    const elRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'xi-api-key': process.env.ELEVENLABS_API_KEY
-      },
-      body: JSON.stringify({
-        text: script,
-        model_id: 'eleven_turbo_v2',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.3,
-          use_speaker_boost: true
-        }
-      })
-    });
-
-    if (!elRes.ok) {
-      const err = await elRes.json().catch(() => ({}));
-      return res.status(elRes.status).json({ error: err.detail || 'ElevenLabs error' });
-    }
-
-    // Stream audio back to client
-    const audioBuffer = await elRes.arrayBuffer();
-    res.set({
-      'Content-Type': 'audio/mpeg',
-      'Content-Length': audioBuffer.byteLength
-    });
-    res.send(Buffer.from(audioBuffer));
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`CoveredIf backend running on port ${PORT}`));
