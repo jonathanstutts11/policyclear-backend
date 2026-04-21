@@ -73,7 +73,17 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
 
 CRITICAL RULES:
 
-scenarios: This is the most important section of the report. Be exhaustive — produce every meaningful scenario you can identify from this policy, typically 16-22 total. Read through every peril, every exclusion, every condition, and every endorsement and turn each one into a plain-English scenario. Do not curate or shortlist — the policyholder deserves to know everything. For each scenario, the covered field must be accurate and the description must start with 'If...' and explain clearly what happens, what the limit is, what the deductible is, and any important catch or condition. Use actual dollar amounts from the policy. Write as if explaining to someone who has never read an insurance policy. Covered scenarios should explain what they get. Not-covered scenarios should explain what they don't get and why it matters. Do not group all covered together then all not-covered — the frontend handles display grouping. Just produce them ordered by likelihood.
+scenarios: This is the most important section of the report. Be exhaustive — produce every meaningful scenario you can identify from this policy, typically 16-22 total. Read through every peril, every exclusion, every condition, and every endorsement and turn each one into a plain-English scenario. Do not curate or shortlist — the policyholder deserves to know everything.
+
+For each scenario description: write like a knowledgeable friend texting you what they found in your policy. Not formal. Not stiff. Conversational and direct. Use "you" and "your" throughout. Start with "If..." and get straight to the point. Use actual dollar amounts. Explain the real-world consequence in plain terms.
+
+BAD example: "Water damage coverage requires the water release to be sudden and accidental. Gradual leaks or seepage over time would not be covered."
+GOOD example: "If a pipe suddenly bursts and floods your kitchen, you're covered — USAA will pay to repair the damage after your $2,000 deductible. But if water has been slowly seeping through a wall for months, that's not covered. It has to be sudden."
+
+BAD example: "If a covered peril causes your dwelling to become uninhabitable, loss of use coverage provides up to $108,600 for additional living expenses."
+GOOD example: "If a fire or other covered disaster makes your home unlivable, USAA will pay your hotel bills, meals, and temporary housing for up to 12 months — up to $108,600 total. That's real money if you're displaced for a while."
+
+Every scenario gets that same quality of explanation regardless of position in the list.
 
 DEDUPLICATION: Every scenario title and exclusion title must be unique. Never list the same event twice with slightly different wording. Review all titles before returning and remove duplicates.
 
