@@ -99,7 +99,7 @@ actionItems: Maximum 3. Genuinely useful and specific to this policy.
 
 dwellingCoverage: Plain number, no formatting — e.g. 400000. Null if not a property policy.
 
-Language standard: Every field must be readable by someone with no insurance background. Short sentences. Active voice. Direct address.
+Language standard: Write like a smart friend who knows insurance deeply but explains it in plain terms. Helpful and knowledgeable. Reassuring without being wordy or fluffy. Never condescending, never stiff, never corporate. The goal is to take complex policy language and distill it into something anyone can understand immediately — without losing accuracy or specificity. Always use the actual numbers, limits, and conditions from this policy. A good explanation is short, specific, and makes the person feel informed rather than overwhelmed. If you can say it in two sentences, do not use three.
 
 If a section has nothing — return an empty array. Never invent content.`;
 
