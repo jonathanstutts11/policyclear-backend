@@ -273,7 +273,88 @@ app.post('/create-payment-intent', async (req, res) => {
   }
 });
 
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.post('/audio-summary', async (req, res) => {
+  try {
+    const { policyData } = req.body;
+    if (!policyData) return res.status(400).json({ error: 'No policy data provided' });
+
+    // Build a rich, conversational audio script from the policy data
+    const d = policyData;
+    const name = d.policyHolder && d.policyHolder !== 'Unknown' ? d.policyHolder.split(' ')[0] : null;
+    const greeting = name ? `Here's a summary of ${name}'s policy.` : "Here's a summary of your policy.";
+
+    const coveredScenarios = (d.scenarios || []).filter(s => s.covered).slice(0, 3);
+    const notCoveredScenarios = (d.scenarios || []).filter(s => !s.covered).slice(0, 2);
+    const topAction = d.actionItems && d.actionItems[0] ? d.actionItems[0] : null;
+    const hasGap = d.subLimits && d.subLimits.length > 0;
+
+    let script = `${greeting} `;
+    script += `${d.coverageSummary} `;
+
+    if (coveredScenarios.length > 0) {
+      script += `When it comes to what you're covered for: `;
+      coveredScenarios.forEach(s => { script += `${s.description} `; });
+    }
+
+    if (notCoveredScenarios.length > 0) {
+      script += `There are also some important gaps to be aware of. `;
+      notCoveredScenarios.forEach(s => { script += `${s.description} `; });
+    }
+
+    if (d.valuationMethod && d.valuationMethod.explanation) {
+      script += `On how claims are paid: ${d.valuationMethod.explanation} `;
+    }
+
+    if (hasGap) {
+      script += `Your policy also has some sub-limits — dollar caps on specific categories like jewelry or electronics — that are worth reviewing in your full report. `;
+    }
+
+    if (topAction) {
+      script += `One key thing to act on: ${topAction} `;
+    }
+
+    script += `Your full CoveredIf report has all the details, including your insurer's ratings and a rebuild cost estimate for your property.`;
+
+    // Call ElevenLabs API — Rachel voice
+    const VOICE_ID = '21m00Tcm4TlvDq8ikWAM';
+    const elRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': process.env.ELEVENLABS_API_KEY
+      },
+      body: JSON.stringify({
+        text: script,
+        model_id: 'eleven_turbo_v2',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.3,
+          use_speaker_boost: true
+        }
+      })
+    });
+
+    if (!elRes.ok) {
+      const err = await elRes.json().catch(() => ({}));
+      return res.status(elRes.status).json({ error: err.detail || 'ElevenLabs error' });
+    }
+
+    // Stream audio back to client
+    const audioBuffer = await elRes.arrayBuffer();
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.byteLength
+    });
+    res.send(Buffer.from(audioBuffer));
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`CoveredIf backend running on port ${PORT}`));
