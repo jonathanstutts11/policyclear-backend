@@ -20,6 +20,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "insurer": "Insurance company name exactly as written",
   "policyType": "Homeowners / Umbrella / Condo / Renters / Dwelling Fire — return the most accurate description based on what you read",
   "propertyAddress": "Full insured property address as shown on the declarations page, or null if not found",
+  "propertyCity": "City name only from the insured property address — e.g. 'Redondo Beach' or 'Austin'. Return just the city name, no state, no zip, no street. Or null if not found.",
   "zipCode": "5-digit zip code from the insured address, or null",
   "squareFootage": "Living area square footage of the home as shown on the declarations page or elsewhere in the document — return as a number only e.g. 2100, or null if not found",
   "effectiveDate": "MM/DD/YYYY or Not found",
@@ -164,7 +165,7 @@ app.post('/analyze', async (req, res) => {
 
 app.post('/rebuild', async (req, res) => {
   try {
-    const { homeValue, dwellingCoverage, zipCode, finishLevel, squareFootage } = req.body;
+    const { homeValue, dwellingCoverage, zipCode, finishLevel, squareFootage, propertyCity } = req.body;
     if (!homeValue || !dwellingCoverage) return res.status(400).json({ error: 'Missing required fields' });
 
     const zip = zipCode ? parseInt(zipCode) : null;
@@ -243,7 +244,9 @@ app.post('/rebuild', async (req, res) => {
     else if (gap > -10000) status = 'close';
 
     res.json({
-      status, regionName, estimatedRebuild,
+      status, 
+      regionName: propertyCity || regionName,
+      estimatedRebuild,
       estimatedRebuildLow: Math.round(estimatedRebuildLow / 5000) * 5000,
       estimatedRebuildHigh: Math.round(estimatedRebuildHigh / 5000) * 5000,
       coverage, finishLevel: finishLevel || 'Not specified', finishLabel,
