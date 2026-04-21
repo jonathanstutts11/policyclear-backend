@@ -75,15 +75,15 @@ CRITICAL RULES:
 
 scenarios: This is the most important section of the report. Be exhaustive — produce every meaningful scenario you can identify from this policy, typically 16-22 total. Read through every peril, every exclusion, every condition, and every endorsement and turn each one into a plain-English scenario. Do not curate or shortlist — the policyholder deserves to know everything.
 
-For each scenario description: write like a knowledgeable friend texting you what they found in your policy. Not formal. Not stiff. Conversational and direct. Use "you" and "your" throughout. Start with "If..." and get straight to the point. Use actual dollar amounts. Explain the real-world consequence in plain terms.
+For each scenario description: be direct and specific. Use "you" and "your." Start with "If..." and get straight to the point. Use actual dollar amounts from this policy. State clearly what's covered or not, what the limit is, what the deductible is, and any key condition. No filler words, no folksy language, no unnecessary sentences.
 
-BAD example: "Water damage coverage requires the water release to be sudden and accidental. Gradual leaks or seepage over time would not be covered."
-GOOD example: "If a pipe suddenly bursts and floods your kitchen, you're covered — USAA will pay to repair the damage after your $2,000 deductible. But if water has been slowly seeping through a wall for months, that's not covered. It has to be sudden."
+BAD: "Water damage coverage requires the water release to be sudden and accidental. Gradual leaks or seepage over time would not be covered."
+GOOD: "If a pipe suddenly bursts, the damage is covered after your $2,000 deductible. Slow leaks or gradual seepage are not — it has to be sudden and accidental."
 
-BAD example: "If a covered peril causes your dwelling to become uninhabitable, loss of use coverage provides up to $108,600 for additional living expenses."
-GOOD example: "If a fire or other covered disaster makes your home unlivable, USAA will pay your hotel bills, meals, and temporary housing for up to 12 months — up to $108,600 total. That's real money if you're displaced for a while."
+BAD: "If a covered peril causes your dwelling to become uninhabitable, loss of use coverage provides up to $108,600 for additional living expenses for up to 12 months."
+GOOD: "If a fire or other covered disaster makes your home unlivable, USAA covers your hotel and temporary housing costs up to $108,600 for up to 12 months."
 
-Every scenario gets that same quality of explanation regardless of position in the list.
+Every scenario gets that same quality and tone regardless of position in the list.
 
 DEDUPLICATION: Every scenario title and exclusion title must be unique. Never list the same event twice with slightly different wording. Review all titles before returning and remove duplicates.
 
