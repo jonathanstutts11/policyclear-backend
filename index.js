@@ -72,7 +72,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
 
 CRITICAL RULES:
 
-scenarios: Include 6-9. Order from most likely to least likely to actually happen to this policyholder. For homeowners think: fire, theft, water damage from plumbing, liability if someone is injured, wind/storm, fallen tree, power outage, flood, earthquake. Include both covered AND not-covered scenarios mixed together — the covered field distinguishes them. Each description must start with 'If...' and reference actual limits from the document.
+scenarios: Produce as many scenarios as are genuinely present in this policy — aim for 14-18 total. Order them by likelihood of actually happening to this specific policyholder. The first 10 will be shown prominently and the rest behind a "See more" toggle, so make the first 10 the most impactful and likely. Among the first 10, include at least 5 covered and at least 3 not covered — a balanced mix makes the report more useful and engaging. The remaining scenarios should also maintain a reasonable covered/not covered balance. Every scenario regardless of position gets the same quality of description — full plain-English explanation with actual dollar amounts and conditions from the policy. Each description must start with 'If...' No scenario should have a shorter or lower-quality description just because it appears later in the list.
 
 DEDUPLICATION — CRITICAL: Every scenario title and every exclusion title must be unique. Never list the same peril or event twice even with slightly different wording. Before finalizing your response, review all scenario titles and all exclusion titles and remove any duplicates. 'Flood damage' and 'Flood' are duplicates — keep only one. 'Earthquake' and 'Earthquake damage' are duplicates — keep only one.
 
@@ -283,31 +283,43 @@ app.post('/audio-summary', async (req, res) => {
     const name = d.policyHolder && d.policyHolder !== 'Unknown' ? d.policyHolder.split(' ')[0] : null;
     const greeting = name ? `Here's a summary of ${name}'s policy.` : "Here's a summary of your policy.";
 
-    const coveredScenarios = (d.scenarios || []).filter(s => s.covered).slice(0, 3);
-    const notCoveredScenarios = (d.scenarios || []).filter(s => !s.covered).slice(0, 2);
+    // Trim helper — keep descriptions concise for audio
+    const trim = (str, max=200) => str && str.length > max ? str.slice(0, str.lastIndexOf(' ', max)) + '.' : str;
+
+    const coveredScenarios = (d.scenarios || []).filter(s => s.covered).slice(0, 2);
+    const notCoveredScenarios = (d.scenarios || []).filter(s => !s.covered).slice(0, 1);
     const topAction = d.actionItems && d.actionItems[0] ? d.actionItems[0] : null;
     const hasGap = d.subLimits && d.subLimits.length > 0;
 
     let script = `${greeting} `;
-    script += `${d.coverageSummary} `;
+    script += `${trim(d.coverageSummary, 300)} `;
 
     if (coveredScenarios.length > 0) {
-      script += `When it comes to what you're covered for: `;
-      coveredScenarios.forEach(s => { script += `${s.description} `; });
+      script += `Here are a couple of things you're covered for. `;
+      coveredScenarios.forEach(s => { script += `${trim(s.description)} `; });
     }
 
     if (notCoveredScenarios.length > 0) {
-      script += `There are also some important gaps to be aware of. `;
-      notCoveredScenarios.forEach(s => { script += `${s.description} `; });
+      script += `One important gap to be aware of: `;
+      notCoveredScenarios.forEach(s => { script += `${trim(s.description)} `; });
     }
 
     if (d.valuationMethod && d.valuationMethod.explanation) {
-      script += `On how claims are paid: ${d.valuationMethod.explanation} `;
+      script += `On how claims are paid: ${trim(d.valuationMethod.explanation, 200)} `;
     }
 
     if (hasGap) {
-      script += `Your policy also has some sub-limits — dollar caps on specific categories like jewelry or electronics — that are worth reviewing in your full report. `;
+      script += `Your policy also has sub-limits — dollar caps on categories like jewelry or electronics — worth reviewing in your full report. `;
     }
+
+    if (topAction) {
+      script += `One key thing to act on: ${trim(topAction)} `;
+    }
+
+    script += `Your full CoveredIf report has all the details, including your insurer's ratings and a rebuild cost estimate for your property.`;
+
+    // Hard cap at 2000 characters for ElevenLabs free tier efficiency
+    if (script.length > 2000) script = script.slice(0, script.lastIndexOf(' ', 2000)) + '. Your full report has more details.';
 
     if (topAction) {
       script += `One key thing to act on: ${topAction} `;
