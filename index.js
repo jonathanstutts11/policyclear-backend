@@ -78,7 +78,17 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   ]
 }
 
-CRITICAL RULES:
+POLICY TYPE GUIDANCE:
+
+Homeowners (HO-3, HO-5): Full analysis — all sections apply. This is the richest policy type.
+
+Landlord / Dwelling Fire (DP-1, DP-2, DP-3): Full analysis applies. Note that loss of use is replaced by loss of rents. Scenarios should reflect landlord risks — tenant damage, loss of rental income, liability for tenant injuries. Personal property coverage may be limited or absent.
+
+Condo (HO-6): Full analysis applies. Pay special attention to the distinction between unit coverage and what the HOA master policy covers. Flag gaps between the two in keyFindings if identifiable.
+
+Umbrella: These are intentionally simple excess liability documents. The analysis will be shorter by design — there is no property coverage, no dwelling, no personal property. Focus entirely on the liability limit, what underlying policies are required, any exclusions, and any gaps. In the coverageSummary, note clearly that umbrella policies provide excess liability coverage above the user's underlying home and auto policies, and that this analysis is most useful when read alongside those underlying policies. Do not generate rebuild check data. Scenarios should focus exclusively on liability events.
+
+Renters (HO-4): Analyze personal property, liability, and loss of use. Note there is no dwelling coverage since the tenant does not own the building.
 
 READING STRATEGY: Start with the Declarations Page. Identify the ISO form type (HO-3, HO-5, etc.), Coverage A through F amounts, all deductibles including percentage-based ones, and the policy period. Then read the perils, exclusions, conditions, and endorsements sections in full. Check the back pages for endorsements — they often override or expand the main policy text.
 
