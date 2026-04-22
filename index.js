@@ -18,7 +18,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "policyHolder": "Full name as it appears on the policy, or Unknown",
   "policyNumber": "Policy number as shown, or Not found",
   "insurer": "Insurance company name exactly as written",
-  "policyType": "Return the ISO form type if identifiable (e.g. 'HO-3 Homeowners', 'HO-5 Homeowners', 'HO-6 Condo', 'HO-4 Renters') plus the plain-English description. If form type not found, return the plain-English type only.",
+  "policyType": "Return plain English only — e.g. 'Homeowners', 'Umbrella', 'Condo', 'Renters'. Do not include ISO form numbers here.",
   "propertyAddress": "Full insured property address as shown on the declarations page, or null if not found",
   "propertyCity": "City name only from the insured property address — e.g. 'Redondo Beach' or 'Austin'. Return just the city name, no state, no zip, no street. Or null if not found.",
   "zipCode": "5-digit zip code from the insured address, or null",
