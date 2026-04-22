@@ -29,7 +29,7 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
   "deductible": "Primary deductible — e.g. $1,000",
   "dwellingCoverage": 400000,
   "finishLevel": "Return exactly one: 'Builder-grade (standard finishes)' OR 'Mid-range (upgraded finishes)' OR 'High-end (custom/luxury finishes)' OR 'Not specified in policy'",
-  "coverageSummary": "Write 3-5 sentences directly to the policyholder using 'you' and 'your'. Be specific — use actual dollar amounts, coverage names, and notable features. Do not repeat the property address. Feel like a knowledgeable friend summarizing exactly what they have. No jargon without explanation.",
+  "coverageSummary": "Write 3-5 sentences directly to the policyholder using 'you' and 'your'. Be specific and complete — include dwelling coverage and any endorsements that extend it (name the endorsement and the exact dollar amount it adds), personal property limit, loss of use limit and duration, liability limit, deductible. If there are separate policies mentioned (earthquake, flood), call them out with their limits and deductibles. Name standout features like replacement cost coverage, water backup, workers comp for household employees. Read like a sharp complete briefing. Do not repeat the property address.",
   "valuationMethod": {
     "type": "RCV OR ACV OR Mixed OR Unknown",
     "explanation": "Explain in plain English how this policy pays out on a claim. Give a concrete real-world example using actual numbers from this policy — e.g. what happens to a 10-year-old roof that gets destroyed."
@@ -75,7 +75,7 @@ CRITICAL RULES:
 
 scenarios: This is the most important section of the report. Be exhaustive — produce every meaningful scenario you can identify from this policy, typically 16-22 total. Read through every peril, every exclusion, every condition, and every endorsement and turn each one into a plain-English scenario. Do not curate or shortlist — the policyholder deserves to know everything.
 
-For each scenario description: be direct and specific. Use "you" and "your." Start with "If..." and get straight to the point. Use actual dollar amounts from this policy. State clearly what's covered or not, what the limit is, what the deductible is, and any key condition. No filler words, no folksy language, no unnecessary sentences.
+For each scenario description: be direct and specific. Use "you" and "your." Start with "If..." and get straight to the point. Always state the specific dollar limit that applies — never say "up to your policy limits" or "up to your coverage limits." If the scenario is covered under the main dwelling limit, say "up to your $543,000 dwelling coverage" (use the actual number from the policy). If it's personal property, say "up to your $271,500 personal property limit." Always state the deductible when it applies. State clearly what's covered or not and any key condition. No filler words.
 
 BAD: "Water damage coverage requires the water release to be sudden and accidental. Gradual leaks or seepage over time would not be covered."
 GOOD: "If a pipe suddenly bursts, the damage is covered after your $2,000 deductible. Slow leaks or gradual seepage are not — it has to be sudden and accidental."
@@ -139,14 +139,19 @@ app.post('/analyze', async (req, res) => {
     const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
     const policy = JSON.parse(raw);
 
-    // Server-side dedup on scenarios and exclusions
+    // Server-side dedup — fuzzy match on first significant word to catch near-duplicates
     const dedup = arr => {
       if (!Array.isArray(arr)) return arr;
       const seen = new Set();
       return arr.filter(item => {
-        const key = (item.title || item).toLowerCase().replace(/[^a-z]/g, '');
+        const title = (item.title || item).toLowerCase();
+        // Extract first two significant words as the key
+        const words = title.replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(w => w.length > 2);
+        const key = words.slice(0, 2).join('');
         if (seen.has(key)) return false;
         seen.add(key);
+        // Also add single-word key to catch "earthquake" vs "earthquake damage"
+        if (words[0]) seen.add(words[0]);
         return true;
       });
     };
