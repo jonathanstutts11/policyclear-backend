@@ -66,12 +66,25 @@ Return ONLY valid JSON. No markdown, no backticks, no explanation outside the JS
       "description": "1-2 sentences. What is excluded and why it matters to this specific policyholder."
     }
   ],
+  "keyFindings": [
+    {
+      "type": "warning OR positive",
+      "title": "3-6 words — the finding itself, plain English. e.g. 'Flood damage not covered' or 'Replacement cost coverage included'",
+      "insight": "One sentence. The consequence in plain English — what this actually means for the policyholder's wallet or protection. No jargon. Use actual dollar amounts where relevant. This is the 'so what' — why this finding matters."
+    }
+  ],
   "actionItems": [
     "One sentence. One specific, practical thing based on what you found in this policy. Not generic — relevant to this person's situation."
   ]
 }
 
 CRITICAL RULES:
+
+keyFindings: Generate 2-4 findings maximum. These are the most important things a policyholder should know about their specific policy — the findings that are most likely to affect their finances or protection. Prioritize findings that are surprising, alarming, or notably strong. Only include findings that are specific to this policy — not generic insurance advice.
+
+Good candidates: valuation method (RCV vs ACV — explain the real-world consequence clearly), rebuild coverage gap (if sq footage and dwelling coverage suggest underinsurance), significant sub-limits (e.g. $1,500 jewelry limit when most people own more), missing earthquake or flood coverage in high-risk areas, unusually low or high liability limits, notable endorsements that add meaningful protection.
+
+For each insight, explain WHY it matters in plain English. ACV means "if your 10-year-old roof is destroyed, you won't get enough to replace it — you get what it's worth used, not what it costs new." RCV means "you get full replacement cost with no depreciation deductions." Never use acronyms without explaining them in the same sentence. type must be exactly "warning" or "positive".
 
 scenarios: This is the most important section of the report. Be exhaustive — produce every meaningful scenario you can identify from this policy, typically 16-22 total. Read through every peril, every exclusion, every condition, and every endorsement and turn each one into a plain-English scenario. Do not curate or shortlist — the policyholder deserves to know everything.
 
@@ -157,6 +170,7 @@ app.post('/analyze', async (req, res) => {
     };
     policy.scenarios = dedup(policy.scenarios);
     policy.keyExclusions = dedup(policy.keyExclusions);
+    if (!Array.isArray(policy.keyFindings)) policy.keyFindings = [];
 
     res.json(policy);
   } catch (err) {
