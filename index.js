@@ -119,6 +119,8 @@ dwellingCoverage: Plain number, no formatting — e.g. 400000. Null if not a pro
 
 Language standard: Write like a smart friend who knows insurance deeply but explains it in plain terms. Helpful and knowledgeable. Reassuring without being wordy or fluffy. Never condescending, never stiff, never corporate. Always use the actual numbers, limits, and conditions from this policy. If you can say it in two sentences, do not use three.
 
+NEVER use sensationalized or alarmist language. Do not say things like "financially devastate you," "catastrophic," "devastating," "could ruin you," or similar dramatic phrases. State the facts and let the numbers speak for themselves. BAD: "this could financially devastate you." GOOD: just state the dollar amount and move on.
+
 If a section has nothing — return an empty array. Never invent content.`;
 
 
@@ -158,19 +160,24 @@ app.post('/analyze', async (req, res) => {
     const raw = (data.content?.[0]?.text || '').replace(/```json|```/g, '').trim();
     const policy = JSON.parse(raw);
 
-    // Server-side dedup — fuzzy match on first significant word to catch near-duplicates
+    // Server-side dedup — catches near-duplicates by comparing first significant word
     const dedup = arr => {
       if (!Array.isArray(arr)) return arr;
       const seen = new Set();
       return arr.filter(item => {
-        const title = (item.title || item).toLowerCase();
-        // Extract first two significant words as the key
-        const words = title.replace(/[^a-z\s]/g, '').trim().split(/\s+/).filter(w => w.length > 2);
-        const key = words.slice(0, 2).join('');
-        if (seen.has(key)) return false;
-        seen.add(key);
-        // Also add single-word key to catch "earthquake" vs "earthquake damage"
-        if (words[0]) seen.add(words[0]);
+        const title = (item.title || item).toLowerCase().replace(/[^a-z\s]/g, '').trim();
+        const words = title.split(/\s+/).filter(w => w.length > 2);
+        if (!words.length) return true;
+        // Check full normalized title
+        const fullKey = words.join('');
+        if (seen.has(fullKey)) return false;
+        seen.add(fullKey);
+        // Also block if first meaningful word already seen (catches "nuclear accident" vs "nuclear hazard")
+        const firstWord = words[0];
+        // Only block on first word for common ambiguous terms
+        const blockOnFirst = ['nuclear','earthquake','flood','maintenance','business','war','mold','water','fire'];
+        if (blockOnFirst.includes(firstWord) && seen.has('FIRST:'+firstWord)) return false;
+        if (blockOnFirst.includes(firstWord)) seen.add('FIRST:'+firstWord);
         return true;
       });
     };
