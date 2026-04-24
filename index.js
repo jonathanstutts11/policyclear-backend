@@ -208,26 +208,97 @@ app.post('/rebuild', async (req, res) => {
     if (!homeValue || !dwellingCoverage) return res.status(400).json({ error: 'Missing required fields' });
 
     const zip = zipCode ? parseInt(zipCode) : null;
-    let costLow = 180, costMid = 250, costHigh = 380, regionName = 'your area';
+    let costLow = 175, costMid = 240, costHigh = 360, regionName = 'your area';
 
     if (zip) {
-      if (zip >= 90200 && zip <= 90299) { costLow=320; costMid=450; costHigh=650; regionName='Los Angeles area'; }
-      else if (zip >= 90000 && zip <= 96999) { costLow=280; costMid=400; costHigh=580; regionName='California'; }
+      // California — metro specific
+      if (zip >= 90200 && zip <= 90899) { costLow=320; costMid=450; costHigh=650; regionName='Los Angeles area'; }
+      else if (zip >= 91000 && zip <= 91999) { costLow=300; costMid=430; costHigh=620; regionName='Los Angeles area'; }
+      else if (zip >= 90000 && zip <= 90199) { costLow=300; costMid=430; costHigh=620; regionName='Los Angeles area'; }
+      else if (zip >= 94100 && zip <= 94199) { costLow=380; costMid=520; costHigh=750; regionName='San Francisco'; }
+      else if (zip >= 94000 && zip <= 94999) { costLow=340; costMid=480; costHigh=700; regionName='Bay Area'; }
+      else if (zip >= 95000 && zip <= 95999) { costLow=280; costMid=390; costHigh=560; regionName='Sacramento area'; }
       else if (zip >= 92000 && zip <= 92999) { costLow=300; costMid=420; costHigh=600; regionName='San Diego area'; }
-      else if (zip >= 10000 && zip <= 14999) { costLow=260; costMid=370; costHigh=520; regionName='New York'; }
-      else if (zip >= 98000 && zip <= 99499) { costLow=240; costMid=340; costHigh=480; regionName='Washington State'; }
-      else if (zip >= 97000 && zip <= 97999) { costLow=220; costMid=310; costHigh=440; regionName='Oregon'; }
-      else if (zip >= 80000 && zip <= 81999) { costLow=200; costMid=285; costHigh=400; regionName='Colorado'; }
-      else if (zip >= 33000 && zip <= 34999) { costLow=190; costMid=270; costHigh=380; regionName='Florida'; }
-      else if (zip >= 60000 && zip <= 62999) { costLow=175; costMid=245; costHigh=345; regionName='Illinois'; }
-      else if (zip >= 77000 && zip <= 79999) { costLow=165; costMid=230; costHigh=320; regionName='Texas'; }
-      else if (zip >= 78000 && zip <= 78999) { costLow=165; costMid=230; costHigh=320; regionName='Texas'; }
-      else if (zip >= 30000 && zip <= 31999) { costLow=160; costMid=225; costHigh=315; regionName='Georgia'; }
-      else if (zip >= 85000 && zip <= 86999) { costLow=175; costMid=245; costHigh=345; regionName='Arizona'; }
-      else if (zip >= 20000 && zip <= 20599) { costLow=250; costMid=350; costHigh=490; regionName='DC area'; }
-      else if (zip >= 48000 && zip <= 49999) { costLow=160; costMid=225; costHigh=315; regionName='Michigan'; }
-      else if (zip >= 55000 && zip <= 56999) { costLow=165; costMid=235; costHigh=330; regionName='Minnesota'; }
-      else if (zip >= 19000 && zip <= 19999) { costLow=200; costMid=285; costHigh=400; regionName='Pennsylvania'; }
+      else if (zip >= 93000 && zip <= 93999) { costLow=260; costMid=360; costHigh=520; regionName='Central California'; }
+      else if (zip >= 96000 && zip <= 96999) { costLow=240; costMid=330; costHigh=480; regionName='Northern California'; }
+      // Pacific Northwest
+      else if (zip >= 98000 && zip <= 98199) { costLow=260; costMid=360; costHigh=520; regionName='Seattle area'; }
+      else if (zip >= 98200 && zip <= 99499) { costLow=220; costMid=310; costHigh=440; regionName='Washington State'; }
+      else if (zip >= 97000 && zip <= 97299) { costLow=240; costMid=330; costHigh=480; regionName='Portland area'; }
+      else if (zip >= 97300 && zip <= 97999) { costLow=200; costMid=285; costHigh=410; regionName='Oregon'; }
+      // Mountain West
+      else if (zip >= 80000 && zip <= 80299) { costLow=220; costMid=310; costHigh=440; regionName='Denver area'; }
+      else if (zip >= 80300 && zip <= 81999) { costLow=195; costMid=275; costHigh=390; regionName='Colorado'; }
+      else if (zip >= 89100 && zip <= 89199) { costLow=185; costMid=265; costHigh=380; regionName='Las Vegas area'; }
+      else if (zip >= 89000 && zip <= 89999) { costLow=175; costMid=250; costHigh=360; regionName='Nevada'; }
+      else if (zip >= 85000 && zip <= 85399) { costLow=185; costMid=265; costHigh=380; regionName='Phoenix area'; }
+      else if (zip >= 85400 && zip <= 86999) { costLow=170; costMid=240; costHigh=345; regionName='Arizona'; }
+      else if (zip >= 84000 && zip <= 84999) { costLow=185; costMid=260; costHigh=375; regionName='Utah'; }
+      else if (zip >= 83000 && zip <= 83999) { costLow=175; costMid=245; costHigh=355; regionName='Idaho'; }
+      else if (zip >= 59000 && zip <= 59999) { costLow=165; costMid=230; costHigh=330; regionName='Montana'; }
+      else if (zip >= 82000 && zip <= 82999) { costLow=160; costMid=225; costHigh=325; regionName='Wyoming'; }
+      else if (zip >= 87000 && zip <= 87999) { costLow=165; costMid=235; costHigh=335; regionName='New Mexico'; }
+      // Texas
+      else if (zip >= 77000 && zip <= 77099) { costLow=175; costMid=245; costHigh=350; regionName='Houston area'; }
+      else if (zip >= 75200 && zip <= 75299) { costLow=170; costMid=240; costHigh=345; regionName='Dallas area'; }
+      else if (zip >= 75000 && zip <= 76999) { costLow=165; costMid=235; costHigh=335; regionName='North Texas'; }
+      else if (zip >= 78200 && zip <= 78299) { costLow=165; costMid=235; costHigh=335; regionName='San Antonio area'; }
+      else if (zip >= 73300 && zip <= 73399) { costLow=165; costMid=235; costHigh=335; regionName='Austin area'; }
+      else if (zip >= 77100 && zip <= 79999) { costLow=160; costMid=225; costHigh=320; regionName='Texas'; }
+      else if (zip >= 73000 && zip <= 74999) { costLow=155; costMid=215; costHigh=310; regionName='Oklahoma'; }
+      // Southeast
+      else if (zip >= 30300 && zip <= 30399) { costLow=180; costMid=255; costHigh=365; regionName='Atlanta area'; }
+      else if (zip >= 30000 && zip <= 31999) { costLow=165; costMid=230; costHigh=330; regionName='Georgia'; }
+      else if (zip >= 33100 && zip <= 33199) { costLow=200; costMid=280; costHigh=400; regionName='Miami area'; }
+      else if (zip >= 32800 && zip <= 32899) { costLow=185; costMid=260; costHigh=375; regionName='Orlando area'; }
+      else if (zip >= 33000 && zip <= 34999) { costLow=185; costMid=260; costHigh=375; regionName='Florida'; }
+      else if (zip >= 36000 && zip <= 36999) { costLow=155; costMid=215; costHigh=310; regionName='Alabama'; }
+      else if (zip >= 38600 && zip <= 38699) { costLow=155; costMid=215; costHigh=310; regionName='Mississippi'; }
+      else if (zip >= 38000 && zip <= 38599) { costLow=160; costMid=220; costHigh=315; regionName='Tennessee'; }
+      else if (zip >= 37000 && zip <= 37999) { costLow=165; costMid=230; costHigh=330; regionName='Tennessee'; }
+      else if (zip >= 40000 && zip <= 42999) { costLow=160; costMid=225; costHigh=320; regionName='Kentucky'; }
+      else if (zip >= 25000 && zip <= 26999) { costLow=155; costMid=215; costHigh=310; regionName='West Virginia'; }
+      else if (zip >= 29000 && zip <= 29999) { costLow=160; costMid=225; costHigh=320; regionName='South Carolina'; }
+      else if (zip >= 27000 && zip <= 28999) { costLow=165; costMid=235; costHigh=335; regionName='North Carolina'; }
+      else if (zip >= 23000 && zip <= 24999) { costLow=170; costMid=240; costHigh=345; regionName='Virginia'; }
+      else if (zip >= 70000 && zip <= 71499) { costLow=165; costMid=230; costHigh=330; regionName='Louisiana'; }
+      else if (zip >= 71500 && zip <= 72999) { costLow=155; costMid=215; costHigh=310; regionName='Arkansas'; }
+      // Mid-Atlantic & Northeast
+      else if (zip >= 20000 && zip <= 20599) { costLow=260; costMid=365; costHigh=520; regionName='DC area'; }
+      else if (zip >= 20600 && zip <= 21999) { costLow=220; costMid=310; costHigh=445; regionName='Maryland'; }
+      else if (zip >= 19000 && zip <= 19999) { costLow=210; costMid=295; costHigh=425; regionName='Pennsylvania'; }
+      else if (zip >= 15000 && zip <= 18999) { costLow=185; costMid=260; costHigh=375; regionName='Pennsylvania'; }
+      else if (zip >= 10000 && zip <= 10299) { costLow=350; costMid=490; costHigh=700; regionName='New York City'; }
+      else if (zip >= 10300 && zip <= 11999) { costLow=280; costMid=390; costHigh=560; regionName='New York metro'; }
+      else if (zip >= 12000 && zip <= 14999) { costLow=210; costMid=295; costHigh=425; regionName='Upstate New York'; }
+      else if (zip >= 6000 && zip <= 6999) { costLow=230; costMid=320; costHigh=460; regionName='Connecticut'; }
+      else if (zip >= 2000 && zip <= 2999) { costLow=280; costMid=390; costHigh=560; regionName='Boston area'; }
+      else if (zip >= 1000 && zip <= 1999) { costLow=230; costMid=325; costHigh=465; regionName='Massachusetts'; }
+      else if (zip >= 7000 && zip <= 8999) { costLow=240; costMid=335; costHigh=480; regionName='New Jersey'; }
+      else if (zip >= 17000 && zip <= 17999) { costLow=185; costMid=260; costHigh=375; regionName='Pennsylvania'; }
+      // Midwest
+      else if (zip >= 60600 && zip <= 60699) { costLow=200; costMid=280; costHigh=400; regionName='Chicago area'; }
+      else if (zip >= 60000 && zip <= 62999) { costLow=175; costMid=245; costHigh=350; regionName='Illinois'; }
+      else if (zip >= 43000 && zip <= 45999) { costLow=165; costMid=235; costHigh=335; regionName='Ohio'; }
+      else if (zip >= 46000 && zip <= 47999) { costLow=165; costMid=230; costHigh=330; regionName='Indiana'; }
+      else if (zip >= 48000 && zip <= 49999) { costLow=165; costMid=235; costHigh=335; regionName='Michigan'; }
+      else if (zip >= 55000 && zip <= 56999) { costLow=175; costMid=245; costHigh=350; regionName='Minnesota'; }
+      else if (zip >= 53000 && zip <= 54999) { costLow=170; costMid=240; costHigh=345; regionName='Wisconsin'; }
+      else if (zip >= 50000 && zip <= 52999) { costLow=155; costMid=220; costHigh=315; regionName='Iowa'; }
+      else if (zip >= 63000 && zip <= 65999) { costLow=160; costMid=225; costHigh=320; regionName='Missouri'; }
+      else if (zip >= 57000 && zip <= 57999) { costLow=155; costMid=215; costHigh=310; regionName='South Dakota'; }
+      else if (zip >= 58000 && zip <= 58999) { costLow=155; costMid=215; costHigh=310; regionName='North Dakota'; }
+      else if (zip >= 68000 && zip <= 69999) { costLow=155; costMid=215; costHigh=310; regionName='Nebraska'; }
+      else if (zip >= 66000 && zip <= 67999) { costLow=155; costMid=215; costHigh=310; regionName='Kansas'; }
+      // Hawaii & Alaska
+      else if (zip >= 96700 && zip <= 96899) { costLow=380; costMid=520; costHigh=750; regionName='Hawaii'; }
+      else if (zip >= 99500 && zip <= 99999) { costLow=320; costMid=450; costHigh=650; regionName='Alaska'; }
+      // Remaining New England
+      else if (zip >= 3000 && zip <= 3999) { costLow=210; costMid=295; costHigh=425; regionName='New Hampshire'; }
+      else if (zip >= 4000 && zip <= 4999) { costLow=200; costMid=280; costHigh=400; regionName='Maine'; }
+      else if (zip >= 5000 && zip <= 5999) { costLow=210; costMid=295; costHigh=425; regionName='Vermont'; }
+      else if (zip >= 2800 && zip <= 2999) { costLow=230; costMid=320; costHigh=460; regionName='Rhode Island'; }
+      else if (zip >= 19700 && zip <= 19999) { costLow=200; costMid=280; costHigh=400; regionName='Delaware'; }
     }
 
     let finishMultiplier = 1.0, finishLabel = 'standard';
@@ -270,9 +341,11 @@ app.post('/rebuild', async (req, res) => {
     }
 
     const gap = estimatedRebuild - coverage;
+    const gapPct = gap / estimatedRebuild;
     let status = 'adequate';
-    if (gap > 10000) status = 'gap';
-    else if (gap > -10000) status = 'close';
+    if (gapPct > 0.05) status = 'gap';           // more than 5% short = gap
+    else if (gapPct > -0.05) status = 'close';   // within 5% either way = close
+    // otherwise adequate (covered by more than 5%)
 
     res.json({
       status,
