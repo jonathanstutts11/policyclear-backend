@@ -174,20 +174,21 @@ app.post('/analyze', async (req, res) => {
     const dedup = arr => {
       if (!Array.isArray(arr)) return arr;
       const seen = new Set();
+      const seenFirst = new Set();
       return arr.filter(item => {
         const title = (item.title || item).toLowerCase().replace(/[^a-z\s]/g, '').trim();
         const words = title.split(/\s+/).filter(w => w.length > 2);
         if (!words.length) return true;
-        // Check full normalized title
         const fullKey = words.join('');
         if (seen.has(fullKey)) return false;
-        seen.add(fullKey);
-        // Also block if first meaningful word already seen (catches "nuclear accident" vs "nuclear hazard")
+        // Block on first word for common ambiguous terms — check BEFORE adding fullKey
+        const blockOnFirst = ['nuclear','earthquake','flood','maintenance','business','war','mold','water','fire','swimming','pool','earth','gradual'];
         const firstWord = words[0];
-        // Only block on first word for common ambiguous terms
-        const blockOnFirst = ['nuclear','earthquake','flood','maintenance','business','war','mold','water','fire'];
-        if (blockOnFirst.includes(firstWord) && seen.has('FIRST:'+firstWord)) return false;
-        if (blockOnFirst.includes(firstWord)) seen.add('FIRST:'+firstWord);
+        if (blockOnFirst.includes(firstWord)) {
+          if (seenFirst.has(firstWord)) return false;
+          seenFirst.add(firstWord);
+        }
+        seen.add(fullKey);
         return true;
       });
     };
