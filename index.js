@@ -117,7 +117,7 @@ DEDUPLICATION: Every scenario title and exclusion title must be unique. Never li
 
 keyExclusions: 4-6 realistic exclusions relevant to this policyholder. Skip impossible events like nuclear hazard, war, government seizure unless directly relevant.
 
-subLimits: Hunt carefully in personal property and special limits sections. Common ones: jewelry, watches, firearms, cash, securities, silverware, electronics, business property, watercraft, fine arts. Only include what you actually find in the document.
+subLimits: Hunt carefully through every section of the policy — personal property, special limits of liability, scheduled property, endorsements. Do not stop at the obvious ones. Common sub-limits to look for: jewelry/watches/furs, firearms, cash/coins/bank notes, securities/checks/negotiable instruments, silverware/goldware, business property, computers/electronics, fine arts, collectibles/memorabilia, watercraft, trailers, musical instruments, grave markers, credit cards. Return every sub-limit you find with its exact dollar cap and a plain-English explanation of the gap it creates. Only include what you actually find in this document.
 
 andClauses: Include percentage-based deductibles (wind, hail, hurricane) with their calculated dollar amounts. Also look for qualifying language like 'sudden and accidental', 'residence premises' restrictions, vacancy clauses, business use exclusions, and sharing economy restrictions.
 
