@@ -105,10 +105,13 @@ Strong candidates:
 
 Never use acronyms without explaining them in the same sentence. type must be exactly "warning" or "positive".
 
-scenarios: Be exhaustive — 16-22 total. Cover every meaningful peril, exclusion, condition, and endorsement. Do not curate. Use Coverage A/B/C/D/E amounts as the specific limits. Never say "up to your policy limits" — always state the actual dollar amount.
+scenarios: Be exhaustive — 16-22 total. Cover every meaningful peril, exclusion, condition, and endorsement. Do not curate. Never say "up to your policy limits" — always state the actual dollar amount. If an endorsement applies to a scenario (like Water Backup, Mold coverage, Ordinance & Law), you MUST state the specific sub-limit from that endorsement — not the main dwelling limit. For example if Water Backup coverage has a $10,000 limit, the sewer backup scenario must say "covered up to $10,000" not "covered up to $543,000." Always state the deductible. If a scenario has a sub-limit that is significantly lower than the main dwelling limit, make that gap clear — that is critical information for the policyholder.
 
 BAD: "Water damage coverage requires the water release to be sudden and accidental."
 GOOD: "If a pipe suddenly bursts, the damage is covered after your $2,000 deductible. Slow leaks or gradual seepage are not — it has to be sudden and accidental."
+
+BAD: "Sewer backup is covered under your policy."
+GOOD: "If sewage backs up into your home, the Water Backup endorsement covers cleanup and repairs up to $10,000 after your $2,000 deductible — not your full dwelling limit."
 
 BAD: "Loss of use coverage provides additional living expenses."
 GOOD: "If a fire makes your home unlivable, USAA covers hotel and temporary housing up to $108,600 for up to 12 months."
