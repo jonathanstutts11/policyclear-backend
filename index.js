@@ -88,7 +88,7 @@ Condo (HO-6): Full analysis applies. Pay special attention to the distinction be
 
 Umbrella: These are intentionally simple excess liability documents. The analysis will be shorter by design — there is no property coverage, no dwelling, no personal property. Focus entirely on the liability limit, what underlying policies are required, any exclusions, and any gaps. In the coverageSummary, note clearly that umbrella policies provide excess liability coverage above the user's underlying home and auto policies, and that this analysis is most useful when read alongside those underlying policies. Do not generate rebuild check data. Scenarios should focus exclusively on liability events.
 
-Renters (HO-4): Analyze personal property, liability, and loss of use. Note there is no dwelling coverage since the tenant does not own the building.
+Renters (HO-4): Full analysis applies. There is no dwelling coverage since the tenant doesn't own the building — do not generate rebuild check data. Focus on personal property coverage and valuation method (RCV vs ACV is especially important for renters), liability limits, loss of use, and all sub-limits. Key scenarios should reflect renter-specific risks: theft, fire damage to belongings, guest injuries, dog bite liability, temporary housing if unit becomes uninhabitable. Sub-limits on jewelry, electronics, and cash are especially relevant. Flag if liability coverage seems low for someone renting.
 
 READING STRATEGY: Start with the Declarations Page. Identify the ISO form type (HO-3, HO-5, etc.), Coverage A through F amounts, all deductibles including percentage-based ones, and the policy period. Then read the perils, exclusions, conditions, and endorsements sections in full. Check the back pages for endorsements — they often override or expand the main policy text.
 
@@ -106,6 +106,8 @@ Strong candidates:
 Never use acronyms without explaining them in the same sentence. type must be exactly "warning" or "positive".
 
 scenarios: Be exhaustive — 16-22 total. Cover every meaningful peril, exclusion, condition, and endorsement. Do not curate. Never say "up to your policy limits" — always state the actual dollar amount. If an endorsement applies to a scenario (like Water Backup, Mold coverage, Ordinance & Law), you MUST state the specific sub-limit from that endorsement — not the main dwelling limit. For example if Water Backup coverage has a $10,000 limit, the sewer backup scenario must say "covered up to $10,000" not "covered up to $543,000." Always state the deductible. If a scenario has a sub-limit that is significantly lower than the main dwelling limit, make that gap clear — that is critical information for the policyholder.
+
+IMPORTANT: Every endorsement found in the policy must generate at least one scenario. If the policy has a Water Backup endorsement, there must be a sewer/drain backup scenario. If it has a Wildfire Response endorsement, include a wildfire scenario. If it has Workers Compensation, include a household employee injury scenario. Endorsements represent coverage the policyholder specifically paid for — they must appear in the scenarios.
 
 BAD: "Water damage coverage requires the water release to be sudden and accidental."
 GOOD: "If a pipe suddenly bursts, the damage is covered after your $2,000 deductible. Slow leaks or gradual seepage are not — it has to be sudden and accidental."
